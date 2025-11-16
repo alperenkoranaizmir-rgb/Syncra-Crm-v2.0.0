@@ -201,8 +201,10 @@ class UnitAdmin(admin.ModelAdmin):
 class DocumentInline(admin.TabularInline):
     model = Document
     extra = 0
-    fields = ("file_link", "label", "uploaded_by", "uploaded_at")
+    # allow editing the file directly in the inline and show a change link
+    fields = ("file", "label", "file_link", "uploaded_by", "uploaded_at")
     readonly_fields = ("file_link", "uploaded_by", "uploaded_at")
+    show_change_link = True
 
     def file_link(self, obj):
         if not obj or not obj.file:
@@ -233,9 +235,9 @@ class AgreementAdmin(admin.ModelAdmin):
 @admin.register(Document)
 class DocumentAdmin(admin.ModelAdmin):
     list_display = ("label", "file_link", "project", "unit", "uploaded_by", "uploaded_at")
-    readonly_fields = ("uploaded_at",)
+    readonly_fields = ("uploaded_at", "preview")
     search_fields = ("label", "file__icontains")
-    fields = ("label", "file", "project", "unit", "uploaded_by", "uploaded_at")
+    fields = ("label", "preview", "file", "project", "unit", "uploaded_by", "uploaded_at")
 
     def file_link(self, obj):
         if not obj or not obj.file:
@@ -247,6 +249,22 @@ class DocumentAdmin(admin.ModelAdmin):
         return name
 
     file_link.short_description = "Dosya"
+
+    def preview(self, obj):
+        """Show an image thumbnail for image files, or a file icon/name otherwise."""
+        if not obj or not obj.file:
+            return "-"
+        url = getattr(obj.file, "url", None)
+        # crude image detection by extension
+        if url and str(obj.file.name).lower().endswith((".png", ".jpg", ".jpeg", ".gif", ".webp")):
+            return format_html('<img src="{}" style="max-height:150px; max-width:300px;" />', url)
+        # not an image -- show clickable name
+        name = obj.label or obj.file.name.split("/")[-1]
+        if url:
+            return format_html('<a href="{}" target="_blank">{}</a>', url, name)
+        return name
+
+    preview.short_description = "Önizleme"
 
     class DocumentBulkUploadForm(forms.ModelForm):
         # We handle the files upload via request.FILES.getlist('files') in add_view,
