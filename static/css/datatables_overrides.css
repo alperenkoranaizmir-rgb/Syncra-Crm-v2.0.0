@@ -1,0 +1,16 @@
+/* Minimal overrides for DataTables buttons and layout to match AdminLTE look */
+.dt-buttons {
+  margin-top: 6px;
+}
+
+.dt-buttons .btn {
+  margin-left: 6px;
+}
+
+/* Align the table wrapper controls with the card header */
+#example1_wrapper .col-md-6:first-child { display: flex; align-items: center; }
+
+/* Small responsive tweaks */
+@media (max-width: 576px) {
+  .dt-buttons { margin-top: 8px; }
+}
