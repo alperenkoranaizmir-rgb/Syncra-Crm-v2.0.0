@@ -11,7 +11,23 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.12]
+        python-version: [3.10, 3.11, 3.12]
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: test_db
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U user -d test_db" --health-interval=10s --health-timeout=5s --health-retries=5
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
 
     steps:
       - uses: actions/checkout@v4
@@ -20,6 +36,14 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
 
       - name: Install system dependencies (optional for some packages)
         run: |
@@ -32,7 +56,43 @@ jobs:
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
       - name: Collect static files
+        env:
+          DJANGO_SETTINGS_MODULE: config.settings
         run: python manage.py collectstatic --noinput
 
       - name: Run tests
+        env:
+          DATABASE_URL: postgres://user:password@localhost:5432/test_db
+          REDIS_URL: redis://localhost:6379/0
+        run: python manage.py test --verbosity=2
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install system dependencies (optional)
+        run: sudo apt-get update && sudo apt-get install -y build-essential libpango1.0-0 libcairo2 libgdk-pixbuf2.0-0 libffi-dev libxml2 libxslt1.1 || true
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Configure DB env (Postgres)
+        env:
+          DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/test_db
+        run: |
+          echo "Using DATABASE_URL=$DATABASE_URL"
+
+      - name: Collect static files
+        run: python manage.py collectstatic --noinput
+
+      - name: Run tests
+        env:
+          DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/test_db
+          REDIS_URL: redis://127.0.0.1:6379/0
         run: python manage.py test --verbosity=2

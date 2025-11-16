@@ -1,3 +1,5 @@
+import secrets
+
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.test import TestCase, override_settings
@@ -41,7 +43,9 @@ class CoreViewsTests(TestCase):
     def test_demo_pages_render_for_logged_in_user(self):
         # create and login a user, then ensure demo pages render (200)
         User = get_user_model()
-        u = User.objects.create_user(username="tester", password="testpass")
+        # avoid hardcoded passwords in tests (bandit warning); generate a random one
+        password = secrets.token_urlsafe(16)
+        u = User.objects.create_user(username="tester", password=password)
         self.client.force_login(u)
         demo_paths = [
             reverse("core:charts_chartjs"),

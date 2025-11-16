@@ -37,9 +37,10 @@ if not SECRET_KEY:
             secret_file.write_text(SECRET_KEY)
             try:
                 os.chmod(secret_file, 0o600)
-            except Exception:
+            except OSError:
+                # best-effort: if chmod fails, continue without failing startup
                 pass
-    except Exception:
+    except OSError:
         # fallback to in-memory secret if file IO fails
         SECRET_KEY = token_urlsafe(50)
 

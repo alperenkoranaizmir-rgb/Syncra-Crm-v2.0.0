@@ -47,17 +47,71 @@
   {{ block.super }}
   <script src="{% static 'admin-lte/plugins/datatables/jquery.dataTables.min.js' %}"></script>
   <script src="{% static 'admin-lte/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+  <!-- DataTables Buttons extension (optional but improves UX: export/print) -->
+  <link rel="stylesheet" href="{% static 'admin-lte/plugins/datatables-buttons/css/buttons.bootstrap4.min.css' %}">
+  <script src="{% static 'admin-lte/plugins/datatables-buttons/js/dataTables.buttons.min.js' %}"></script>
+  <script src="{% static 'admin-lte/plugins/datatables-buttons/js/buttons.bootstrap4.min.js' %}"></script>
+  <script src="{% static 'admin-lte/plugins/datatables-buttons/js/buttons.colVis.min.js' %}"></script>
+  <script src="{% static 'admin-lte/plugins/datatables-buttons/js/buttons.html5.min.js' %}"></script>
+  <script src="{% static 'admin-lte/plugins/datatables-buttons/js/buttons.print.min.js' %}"></script>
+  <!-- Optional dependencies for export (may be present in the theme package)
+       If not needed, buttons can be removed or left as-is. -->
+  <script src="{% static 'admin-lte/plugins/jszip/jszip.min.js' %}"></script>
+  <script src="{% static 'admin-lte/plugins/pdfmake/pdfmake.min.js' %}"></script>
+  <script src="{% static 'admin-lte/plugins/pdfmake/vfs_fonts.js' %}"></script>
+
   <script>
-    document.addEventListener('DOMContentLoaded', function(){
+    // Use jQuery ready to ensure DataTables and jQuery are loaded
+    jQuery(function($) {
       $('#example1').DataTable({
-        'paging': true,
-        'lengthChange': true,
-        'searching': true,
-        'ordering': true,
-        'info': true,
-        'autoWidth': false,
-        'responsive': true
-      })
-    })
+        paging: true,
+        lengthChange: true,
+        searching: true,
+        ordering: true,
+        info: true,
+        autoWidth: false,
+        responsive: true,
+        // Buttons: export/print/column visibility
+        buttons: [
+          {
+            extend: 'copy',
+            text: 'Kopyala'
+          },
+          {
+            extend: 'csv',
+            text: 'CSV'
+          },
+          {
+            extend: 'excel',
+            text: 'Excel'
+          },
+          {
+            extend: 'pdf',
+            text: 'PDF'
+          },
+          {
+            extend: 'print',
+            text: 'Yazdır'
+          },
+          'colvis'
+        ],
+        // Partial Turkish translations for common UI texts
+        language: {
+          search: 'Ara:',
+          lengthMenu: 'Sayfa başına _MENU_',
+          info: '_START_ - _END_ / _TOTAL_',
+          infoFiltered: '(filtrelendi _MAX_ toplam)',
+          paginate: {
+            previous: 'Önceki',
+            next: 'Sonraki'
+          }
+        },
+        // Place buttons container into the card header for a cleaner layout
+        initComplete: function() {
+          var btns = $('.dt-buttons').addClass('float-right');
+          btns.appendTo($('.card-header').first());
+        }
+      }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+    });
   </script>
 {% endblock %}
