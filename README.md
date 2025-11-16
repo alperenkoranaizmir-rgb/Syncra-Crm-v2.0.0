@@ -128,3 +128,37 @@ Katkıda bulunma
 
 ---
 Bu README temel bir başlangıç sağlar. İsterseniz projeye özel kurulum adımlarını, kullanılan paketleri veya deploy rehberini buraya ekleyebilirim.
+
+## AdminLTE Demo Şablonları
+
+Projeye AdminLTE demo sayfalarının birçok örneği eklendi (charts, tables, UI bileşenleri, mailbox, examples, gallery, kanban, calendar, vb.).
+
+- Yeni yollar `core` uygulaması altında tanımlandı; örnek bazı URL'ler:
+   - `/core/charts/chartjs/` — ChartJS demo
+   - `/core/tables/data/` — DataTables örneği
+   - `/core/examples/projects/` — Projects örneği
+   - `/core/widgets/`, `/core/ui/buttons/`, `/core/calendar/`, `/core/gallery/` vb.
+
+Bu sayfalar `templates/pages/` altında yer almaktadır ve ileride modüllerde kullanılmak üzere şablon bazlı demo içerik sağlar.
+
+## Hızlı test & deploy adımları
+
+1. Statik dosyaları güncelle:
+
+```bash
+python manage.py collectstatic --noinput
+```
+
+2. Testleri çalıştır:
+
+```bash
+python manage.py test
+```
+
+3. Değişiklikleri commitle ve push et:
+
+```bash
+git add .
+git commit -m "Add AdminLTE demo templates and routes"
+git push
+```

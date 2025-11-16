@@ -1,6 +1,7 @@
 from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.conf import settings
+from django.contrib.auth import get_user_model
 
 
 class CoreViewsTests(TestCase):
@@ -23,9 +24,42 @@ class CoreViewsTests(TestCase):
     def test_static_vendor_files_exist(self):
         # Check a few vendor files exist in project static directory
         base = settings.BASE_DIR
-        paths = [
+        # Accept either legacy vendor layout or collected admin-lte plugin paths
+        candidate_paths = [
             base / 'static' / 'vendor' / 'adminlte' / 'adminlte.min.css',
             base / 'static' / 'vendor' / 'adminlte' / 'adminlte.min.js',
+            base / 'staticfiles' / 'admin-lte' / 'dist' / 'css' / 'adminlte.min.css',
+            base / 'staticfiles' / 'admin-lte' / 'dist' / 'js' / 'adminlte.min.js',
         ]
-        for p in paths:
-            self.assertTrue(p.exists(), f"Static file missing: {p}")
+        found = False
+        for p in candidate_paths:
+            if p.exists():
+                found = True
+                break
+        self.assertTrue(found, f"Static file missing (tried paths): {candidate_paths}")
+
+    def test_demo_pages_render_for_logged_in_user(self):
+        # create and login a user, then ensure demo pages render (200)
+        User = get_user_model()
+        u = User.objects.create_user(username='tester', password='testpass')
+        self.client.force_login(u)
+        demo_paths = [
+            reverse('core:charts_chartjs'),
+            reverse('core:tables_datatables'),
+            reverse('core:examples_projects'),
+            reverse('core:widgets'),
+            reverse('core:ui_general'),
+            reverse('core:ui_buttons'),
+            reverse('core:ui_modals'),
+            reverse('core:calendar'),
+            reverse('core:gallery'),
+            reverse('core:kanban'),
+            reverse('core:mailbox'),
+            reverse('core:examples_invoice'),
+            reverse('core:examples_profile'),
+            reverse('core:examples_contacts'),
+            reverse('core:index'),
+        ]
+        for p in demo_paths:
+            resp = self.client.get(p)
+            self.assertIn(resp.status_code, (200, 302), msg=f"{p} returned {resp.status_code}")

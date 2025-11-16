@@ -11,31 +11,31 @@
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
                 <li class="nav-item">
                     <a href="{% url 'core:dashboard' %}" class="nav-link">
-                        <i class="nav-icon bi bi-speedometer2"></i>
+                        <i class="nav-icon fas fa-tachometer-alt"></i>
                         <p>Ana Panel</p>
                     </a>
                 </li>
                 <li class="nav-item has-treeview">
                     <a href="#" class="nav-link">
-                        <i class="nav-icon bi bi-ui-checks-grid"></i>
-                        <p>Formlar <i class="right bi bi-caret-down-fill"></i></p>
+                        <i class="nav-icon fas fa-th-large"></i>
+                        <p>Formlar <i class="right fas fa-caret-down"></i></p>
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
                             <a href="{% url 'core:forms_general' %}" class="nav-link">
-                                <i class="nav-icon bi bi-file-earmark-text"></i>
+                                <i class="nav-icon fas fa-file-alt"></i>
                                 <p>Genel Formlar</p>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="{% url 'core:forms_advanced' %}" class="nav-link">
-                                <i class="nav-icon bi bi-sliders"></i>
+                                <i class="nav-icon fas fa-sliders-h"></i>
                                 <p>Gelişmiş Formlar</p>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="{% url 'core:forms_validation' %}" class="nav-link">
-                                <i class="nav-icon bi bi-check2-square"></i>
+                                <i class="nav-icon fas fa-check-square"></i>
                                 <p>Doğrulama</p>
                             </a>
                         </li>
@@ -43,9 +43,35 @@
                 </li>
                 <li class="nav-item">
                     <a href="{% url 'core:sample_list' %}" class="nav-link">
-                        <i class="nav-icon bi bi-collection"></i>
+                        <i class="nav-icon fas fa-th"></i>
                         <p>Örnek Kayıtlar</p>
                     </a>
+                </li>
+                <li class="nav-item has-treeview">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fas fa-book-open"></i>
+                        <p>Örnekler <i class="right fas fa-caret-down"></i></p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{% url 'core:charts_chartjs' %}" class="nav-link">
+                                <i class="nav-icon fas fa-chart-line"></i>
+                                <p>ChartJS</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url 'core:tables_datatables' %}" class="nav-link">
+                                <i class="nav-icon fas fa-table"></i>
+                                <p>Datatables</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url 'core:examples_projects' %}" class="nav-link">
+                                <i class="nav-icon fas fa-project-diagram"></i>
+                                <p>Projeler</p>
+                            </a>
+                        </li>
+                    </ul>
                 </li>
             </ul>
         </nav>

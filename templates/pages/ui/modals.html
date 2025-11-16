@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}UI Modals{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="card-body">
+    <button class="btn btn-primary" data-toggle="modal" data-target="#demoModal">Modal Aç</button>
+    <div class="modal fade" id="demoModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header"><h5 class="modal-title">Demo Modal</h5></div>
+          <div class="modal-body">İçerik</div>
+          <div class="modal-footer"><button class="btn btn-secondary" data-dismiss="modal">Kapat</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

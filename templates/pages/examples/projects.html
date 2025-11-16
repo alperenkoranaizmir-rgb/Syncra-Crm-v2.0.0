@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Projects Example{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="card card-primary">
+      <div class="card-header">
+        <h3 class="card-title">Projeler</h3>
+        <div class="card-tools">
+          <a href="#" class="btn btn-tool">Yeni Proje</a>
+        </div>
+      </div>
+      <div class="card-body p-0">
+        <ul class="projects-list project-list-in-card pl-2 pr-2">
+          {% for p in projects %}
+          <li class="item">
+            <div class="project">
+              <a class="project-title" href="#">{{ p.title }}</a>
+              <span class="project-badge badge float-right {% if p.status == 'completed' %}badge-success{% elif p.status == 'in-progress' %}badge-warning{% else %}badge-secondary{% endif %}">{{ p.status }}</span>
+              <div class="project-description">{{ p.description }}</div>
+              <div class="project-progress progress xs">
+                <div class="progress-bar {% if p.progress >= 90 %}bg-success{% elif p.progress >= 50 %}bg-warning{% else %}bg-danger{% endif %}" role="progressbar" aria-valuenow="{{ p.progress }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ p.progress }}%"></div>
+              </div>
+              <div class="project-footer d-flex justify-content-between mt-2">
+                <div class="project-people">
+                  {% for m in p.members %}
+                    <span class="badge badge-light mr-1">{{ m }}</span>
+                  {% endfor %}
+                </div>
+                <div class="project-due text-muted">Bitiş: {{ p.due }}</div>
+              </div>
+            </div>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -9,18 +9,16 @@
     <link rel="icon" type="image/svg+xml" href="{% static 'favicon.svg' %}">
     {# Ensure FontAwesome (used by many AdminLTE examples) is available #}
     <link rel="stylesheet" href="{% static 'admin-lte/plugins/fontawesome-free/css/all.min.css' %}">
-    <link rel="stylesheet" href="{% static 'vendor/bootstrap-icons/bootstrap-icons.css' %}">
-    <link rel="stylesheet" href="{% static 'vendor/overlayscrollbars/overlayscrollbars.min.css' %}">
+    <link rel="stylesheet" href="{% static 'admin-lte/plugins/overlayScrollbars/css/OverlayScrollbars.min.css' %}">
     {{ block.super }}
 {% endblock %}
 
 {# Provide necessary JS hooks; adminlte/base.html will include its core scripts, we add local vendors #}
 {% block extra_js %}
-    <script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
-    <script src="{% static 'vendor/bootstrap/popper.min.js' %}"></script>
-    <script src="{% static 'vendor/bootstrap/bootstrap.min.js' %}"></script>
-    <script src="{% static 'vendor/overlayscrollbars/overlayscrollbars.browser.es6.min.js' %}"></script>
-    <script src="{% static 'vendor/apexcharts/apexcharts.min.js' %}"></script>
+    <script src="{% static 'admin-lte/plugins/jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'admin-lte/plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'admin-lte/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js' %}"></script>
+    <script src="{% static 'admin-lte/plugins/chart.js/Chart.min.js' %}"></script>
     {# AdminLTE plugin JS (select2, bs-custom-file-input, inputmask, colorpicker, duallistbox, bootstrap-switch) #}
     <script src="{% static 'admin-lte/plugins/select2/js/select2.full.min.js' %}"></script>
     <script src="{% static 'admin-lte/plugins/bs-custom-file-input/bs-custom-file-input.min.js' %}"></script>

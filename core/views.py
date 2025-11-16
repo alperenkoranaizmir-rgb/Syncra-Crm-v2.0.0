@@ -51,6 +51,50 @@ def forms_validation(request):
     return render(request, 'forms/validation.html')
 
 
+@login_required
+def charts_chartjs(request):
+    return render(request, 'pages/charts/chartjs.html')
+
+
+@login_required
+def tables_datatables(request):
+    return render(request, 'pages/tables/data.html')
+
+
+@login_required
+def examples_projects(request):
+    # sample projects data for demo page
+    projects = [
+        {
+            'id': 1,
+            'title': 'Sürüm 1.0 Hazırlığı',
+            'description': 'Önemli özelliklerin tamamlanması ve testlerin yapılması.',
+            'status': 'completed',
+            'progress': 100,
+            'members': ['Ahmet', 'Ayşe'],
+            'due': '2025-11-01'
+        },
+        {
+            'id': 2,
+            'title': 'Mobil Uyum Rekonfigürasyonu',
+            'description': 'Mobil görünüm iyileştirmeleri ve responsive düzeltmeler.',
+            'status': 'in-progress',
+            'progress': 60,
+            'members': ['Mehmet'],
+            'due': '2025-12-15'
+        },
+        {
+            'id': 3,
+            'title': 'Raporlama Modülü',
+            'description': 'Yeni raporlama ekranları ve PDF export.',
+            'status': 'on-hold',
+            'progress': 25,
+            'members': ['Fatma', 'Can'],
+            'due': '2026-01-30'
+        },
+    ]
+    return render(request, 'pages/examples/projects.html', {'projects': projects})
+
 def handler404(request, exception=None):
     return render(request, '404.html', status=404)
 

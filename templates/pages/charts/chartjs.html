@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}ChartJS Demo{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Area Chart</h3>
+      </div>
+      <div class="card-body">
+        <canvas id="areaChart" style="height:250px"></canvas>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Donut Chart</h3>
+      </div>
+      <div class="card-body">
+        <canvas id="donutChart" style="height:250px"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+  {{ block.super }}
+  <!-- ChartJS -->
+  <script>
+    // Area Chart
+    (function(){
+      var ctx = document.getElementById('areaChart').getContext('2d')
+      var areaChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: ['Ocak','Şub','Mar','Nis','May','Haz','Tem','Ağu','Eyl','Eki','Kas','Ara'],
+          datasets: [{
+            label: 'Aylık Ziyaret',
+            data: [30,45,28,80,40,60,70,55,50,65,75,90],
+            backgroundColor: 'rgba(60,141,188,0.4)',
+            borderColor: 'rgba(60,141,188,1)',
+            fill: true
+          }]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+      })
+    })();
+
+    // Donut Chart
+    (function(){
+      var ctx = document.getElementById('donutChart').getContext('2d')
+      var donutChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Tamamlandı','Devam Ediyor','Beklemede'],
+          datasets: [{ data: [55,30,15], backgroundColor: ['#28a745','#ffc107','#dc3545'] }]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+      })
+    })();
+  </script>
+{% endblock %}
