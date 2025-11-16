@@ -1,0 +1,21 @@
+/* Gallery thumbnail spacing and hover styles */
+.gallery-row .col-6 {
+  padding-left: 6px;
+  padding-right: 6px;
+}
+
+.gallery-row img {
+  border-radius: 0.25rem;
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+
+.gallery-row img:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+}
+
+.card .card-body { padding-bottom: 0.75rem; }
+
+@media (min-width: 992px) {
+  .gallery-row .col-sm-4 { max-width: 33.3333%; }
+}

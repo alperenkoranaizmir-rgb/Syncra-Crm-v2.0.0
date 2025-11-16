@@ -4,14 +4,46 @@
 {% block extra_css %}
   {{ block.super }}
   <link rel="stylesheet" href="{% static 'admin-lte/plugins/ekko-lightbox/ekko-lightbox.css' %}">
+  <link rel="stylesheet" href="{% static 'css/gallery_overrides.css' %}">
 {% endblock %}
 {% block content %}
 <div class="card">
+  <div class="card-header">
+    <h3 class="card-title">Galeri</h3>
+    <div class="card-tools">
+      <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+    </div>
+  </div>
   <div class="card-body">
-    <div class="row">
-      <div class="col-sm-4">
-        <a href="{% static 'admin-lte/dist/img/AdminLTELogo.png' %}" data-toggle="lightbox">
-          <img src="{% static 'admin-lte/dist/img/AdminLTELogo.png' %}" class="img-fluid mb-2" alt="img" />
+    <div class="row gallery-row">
+      <div class="col-6 col-sm-4">
+        <a href="{% static 'admin-lte/dist/img/AdminLTELogo.png' %}" data-toggle="lightbox" data-gallery="gallery">
+          <img src="{% static 'admin-lte/dist/img/AdminLTELogo.png' %}" class="img-fluid mb-2" alt="img-1" />
+        </a>
+      </div>
+      <div class="col-6 col-sm-4">
+        <a href="{% static 'admin-lte/dist/img/AdminLTELogo.png' %}" data-toggle="lightbox" data-gallery="gallery">
+          <img src="{% static 'admin-lte/dist/img/AdminLTELogo.png' %}" class="img-fluid mb-2" alt="img-2" />
+        </a>
+      </div>
+      <div class="col-6 col-sm-4">
+        <a href="{% static 'admin-lte/dist/img/AdminLTELogo.png' %}" data-toggle="lightbox" data-gallery="gallery">
+          <img src="{% static 'admin-lte/dist/img/AdminLTELogo.png' %}" class="img-fluid mb-2" alt="img-3" />
+        </a>
+      </div>
+      <div class="col-6 col-sm-4">
+        <a href="{% static 'admin-lte/dist/img/AdminLTELogo.png' %}" data-toggle="lightbox" data-gallery="gallery">
+          <img src="{% static 'admin-lte/dist/img/AdminLTELogo.png' %}" class="img-fluid mb-2" alt="img-4" />
+        </a>
+      </div>
+      <div class="col-6 col-sm-4">
+        <a href="{% static 'admin-lte/dist/img/AdminLTELogo.png' %}" data-toggle="lightbox" data-gallery="gallery">
+          <img src="{% static 'admin-lte/dist/img/AdminLTELogo.png' %}" class="img-fluid mb-2" alt="img-5" />
+        </a>
+      </div>
+      <div class="col-6 col-sm-4">
+        <a href="{% static 'admin-lte/dist/img/AdminLTELogo.png' %}" data-toggle="lightbox" data-gallery="gallery">
+          <img src="{% static 'admin-lte/dist/img/AdminLTELogo.png' %}" class="img-fluid mb-2" alt="img-6" />
         </a>
       </div>
     </div>
