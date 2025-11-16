@@ -1,9 +1,29 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}Form Editors{% endblock %}
+{% block extra_css %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'admin-lte/plugins/summernote/summernote-bs4.min.css' %}">
+{% endblock %}
 {% block content %}
 <div class="card">
   <div class="card-body">
-    <p>Rich text editor placeholder (Summernote / TinyMCE can be integrated).</p>
+    <form>
+      <div class="form-group">
+        <label>Rich Text</label>
+        <textarea id="summernote"><p>Buraya <strong>zengin metin</strong> yazabilirsiniz.</p></textarea>
+      </div>
+    </form>
   </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+  {{ block.super }}
+  <script src="{% static 'admin-lte/plugins/summernote/summernote-bs4.min.js' %}"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function(){
+      try { $('#summernote').summernote({height: 200}); } catch(e){}
+    });
+  </script>
 {% endblock %}

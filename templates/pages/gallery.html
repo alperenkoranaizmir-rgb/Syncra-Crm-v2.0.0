@@ -1,9 +1,31 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}Gallery{% endblock %}
+{% block extra_css %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'admin-lte/plugins/ekko-lightbox/ekko-lightbox.css' %}">
+{% endblock %}
 {% block content %}
 <div class="card">
   <div class="card-body">
-    <p>Gallery placeholder (lightbox integration can be added later).</p>
+    <div class="row">
+      <div class="col-sm-4">
+        <a href="{% static 'admin-lte/dist/img/AdminLTELogo.png' %}" data-toggle="lightbox">
+          <img src="{% static 'admin-lte/dist/img/AdminLTELogo.png' %}" class="img-fluid mb-2" alt="img" />
+        </a>
+      </div>
+    </div>
   </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+  {{ block.super }}
+  <script src="{% static 'admin-lte/plugins/ekko-lightbox/ekko-lightbox.min.js' %}"></script>
+  <script>
+    $(document).on('click', '[data-toggle="lightbox"]', function(event) {
+      event.preventDefault();
+      $(this).ekkoLightbox();
+    });
+  </script>
 {% endblock %}

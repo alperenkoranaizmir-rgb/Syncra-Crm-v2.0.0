@@ -162,3 +162,17 @@ git add .
 git commit -m "Add AdminLTE demo templates and routes"
 git push
 ```
+
+## Yapılan plugin entegrasyonları
+
+- `DataTables` — tablolarda arama/sıralama/paging desteği (sayfa: `/core/tables/data/`).
+- `Chart.js` — grafikler için (sayfa: `/core/charts/chartjs/`).
+- `Flot` ve `uPlot` — ek chart örnekleri placeholder ile eklendi.
+- `FullCalendar` — takvim entegrasyonu için eklendi ve `calendar` sayfasında başlatıldı.
+- `Summernote` — zengin metin editörü `forms/editors` sayfasına entegre edildi.
+- `Ekko Lightbox` — `gallery` sayfası için lightbox desteği eklendi.
+
+Not: Bazı demo sayfalar placeholder olarak eklendi; isterseniz aşağıdaki adımlarla hepsini pixel-perfect olarak tamamlayabilirim:
+- Detaylı JS init ve stil düzeltmeleri (A).
+- Eksik plugin entegrasyonlarının tam ayarlanması (B).
+- `requirements.txt` güncellemesi pip-freeze çıktısıyla yapıldı (C).

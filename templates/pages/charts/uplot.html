@@ -1,9 +1,23 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}uPlot Charts{% endblock %}
 {% block content %}
 <div class="card">
   <div class="card-body">
-    <p>uPlot demo placeholder.</p>
+    <div id="uplot" style="height:250px"></div>
   </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+  {{ block.super }}
+  <script src="{% static 'admin-lte/plugins/uplot/uPlot.iife.min.js' %}"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function(){
+      try {
+        var data = [[0,1,2,3,4],[1,3,2,5,4]];
+        new uPlot({width:600,height:250}, data, document.getElementById('uplot'));
+      } catch(e){}
+    });
+  </script>
 {% endblock %}
