@@ -30,6 +30,8 @@ class OwnerAdmin(admin.ModelAdmin):
     # Provide an action form to pick a group
     class GroupAssignActionForm(forms.Form):
         group = forms.ModelChoiceField(queryset=Group.objects.all(), required=True)
+        # Admin expects an 'action' field to exist; provide an empty ChoiceField
+        action = forms.ChoiceField(choices=(), required=False)
         upload_s3 = forms.BooleanField(required=False, initial=False)
         s3_bucket = forms.CharField(required=False)
         s3_public = forms.BooleanField(required=False, initial=False)
@@ -208,3 +210,69 @@ class AgreementAdmin(admin.ModelAdmin):
 @admin.register(Document)
 class DocumentAdmin(admin.ModelAdmin):
     list_display = ("__str__", "project", "unit", "uploaded_by", "uploaded_at")
+
+    class DocumentBulkUploadForm(forms.ModelForm):
+        # We handle the files upload via request.FILES.getlist('files') in add_view,
+        # to avoid widget limitations. Labels are provided as textarea lines.
+        labels = forms.CharField(
+            widget=forms.Textarea,
+            required=False,
+            help_text="Her satıra bir etiket girin; dosyalarla sırayla eşlenecektir (örnek: sözleşme).",
+        )
+
+        class Meta:
+            model = Document
+            fields = ("project", "unit", "uploaded_by",)
+
+    def add_view(self, request, form_url="", extra_context=None):
+        """Custom add view to support multiple file uploads with optional labels."""
+        if request.method == "POST":
+            form = self.DocumentBulkUploadForm(request.POST, request.FILES)
+            if form.is_valid():
+                files = request.FILES.getlist("files")
+                labels_raw = form.cleaned_data.get("labels") or ""
+                labels = [l.strip() for l in labels_raw.splitlines() if l.strip()]
+                project = form.cleaned_data.get("project")
+                unit = form.cleaned_data.get("unit")
+                uploaded_by = (
+                    form.cleaned_data.get("uploaded_by") or request.user
+                )
+
+                created = []
+                for idx, f in enumerate(files):
+                    label = labels[idx] if idx < len(labels) else ""
+                    doc = Document.objects.create(
+                        project=project,
+                        unit=unit,
+                        file=f,
+                        label=label,
+                        uploaded_by=uploaded_by,
+                    )
+                    created.append(doc)
+
+                # After creation redirect to unit change page if unit provided, else to document changelist
+                if unit:
+                    from django.urls import reverse
+
+                    return_url = reverse("admin:proje_unit_change", args=[unit.pk])
+                else:
+                    from django.urls import reverse
+
+                    return_url = reverse("admin:proje_document_changelist")
+                from django.shortcuts import redirect
+
+                self.message_user(request, f"Yüklendi: {len(created)} dosya")
+                return redirect(return_url)
+        else:
+            form = self.DocumentBulkUploadForm()
+
+        # Render custom template using the form (falls back to admin add template fields)
+        context = dict(
+            self.admin_site.each_context(request),
+            title="Proje Dosyası Ekle (Çoklu)",
+            form=form,
+            opts=self.model._meta,
+        )
+        from django.template.response import TemplateResponse
+
+        return TemplateResponse(request, "admin/proje/document_add_bulk.html", context)

@@ -201,6 +201,7 @@ class Document(models.Model):
         Unit, on_delete=models.CASCADE, related_name="documents", null=True, blank=True
     )
     file = models.FileField(upload_to="proje_documents/")
+    label = models.CharField("Dosya Adı", max_length=200, blank=True)
     uploaded_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True
     )

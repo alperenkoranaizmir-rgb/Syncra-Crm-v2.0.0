@@ -1,0 +1,26 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block content %}
+  <h1>{{ title }}</h1>
+    <form method="post" enctype="multipart/form-data" novalidate>
+    {% csrf_token %}
+    <table>
+      {{ form.project.errors }}
+      <tr><th>{{ form.project.label_tag }}</th><td>{{ form.project }}</td></tr>
+      {{ form.unit.errors }}
+      <tr><th>{{ form.unit.label_tag }}</th><td>{{ form.unit }}</td></tr>
+      {{ form.uploaded_by.errors }}
+      <tr><th>{{ form.uploaded_by.label_tag }}</th><td>{{ form.uploaded_by }}</td></tr>
+      <tr>
+        <th><label for="id_files">Dosyalar</label></th>
+        <td><input type="file" name="files" id="id_files" multiple></td>
+      </tr>
+      {{ form.labels.errors }}
+      <tr><th>{{ form.labels.label_tag }}</th><td>{{ form.labels }}</td></tr>
+    </table>
+    <div class="submit-row">
+      <input type="submit" value="Kaydet" class="default" />
+    </div>
+  </form>
+{% endblock %}
