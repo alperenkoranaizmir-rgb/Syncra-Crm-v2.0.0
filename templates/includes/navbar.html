@@ -1,3 +1,4 @@
+{% load static %}
 <nav class="main-header navbar navbar-expand navbar-white navbar-light">
     <!-- Left navbar links -->
     <ul class="navbar-nav">
@@ -11,11 +12,30 @@
 
     <!-- Right navbar links -->
     <ul class="navbar-nav ml-auto">
-        <li class="nav-item">
-            <a class="nav-link" href="{% url 'core:profile' %}">Profil</a>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a class="nav-link" data-widget="fullscreen" href="#" role="button" title="Tam ekran"><i class="bi bi-arrows-fullscreen"></i></a>
         </li>
+
+        <!-- User account -->
+        {% if request.user.is_authenticated %}
+        <li class="nav-item dropdown">
+            <a class="nav-link" data-toggle="dropdown" href="#" aria-expanded="false">
+                <img src="{% static 'vendor/adminlte/img/user2-160x160.jpg' %}" class="img-circle elevation-2" alt="User" style="width:24px;height:24px;"> {{ request.user.username }}
+            </a>
+            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+                <a href="{% url 'core:profile' %}" class="dropdown-item">Profil</a>
+                <div class="dropdown-divider"></div>
+                <a href="{% url 'logout' %}" class="dropdown-item">Çıkış</a>
+            </div>
+        </li>
+        {% else %}
         <li class="nav-item">
-            <a class="nav-link" href="{% url 'logout' %}">Çıkış</a>
+            <a class="nav-link" href="{% url 'login' %}">Giriş</a>
+        </li>
+        {% endif %}
+
+        <li class="nav-item">
+            <a class="nav-link" data-widget="control-sidebar" data-controlsidebar-slide="true" href="#" role="button"><i class="bi bi-gear-fill"></i></a>
         </li>
     </ul>
 </nav>
