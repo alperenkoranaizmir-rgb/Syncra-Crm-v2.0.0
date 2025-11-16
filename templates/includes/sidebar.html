@@ -1,0 +1,29 @@
+<aside class="main-sidebar sidebar-dark-primary elevation-4">
+    <!-- Brand Logo -->
+    <a href="/" class="brand-link">
+        <span class="brand-text font-weight-light">Syncra CRM</span>
+    </a>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <!-- Sidebar Menu -->
+        <nav class="mt-2">
+            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
+                <li class="nav-item">
+                    <a href="{% url 'core:dashboard' %}" class="nav-link">
+                        <i class="nav-icon bi bi-speedometer2"></i>
+                        <p>Ana Panel</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'core:sample_list' %}" class="nav-link">
+                        <i class="nav-icon bi bi-collection"></i>
+                        <p>Örnek Kayıtlar</p>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        <!-- /.sidebar-menu -->
+    </div>
+    <!-- /.sidebar -->
+</aside>

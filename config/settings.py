@@ -126,6 +126,11 @@ LOCALE_PATHS = [BASE_DIR / 'locale']
 
 STATIC_URL = 'static/'
 
+# Local static files directory (vendor assets stored in `static/`)
+STATICFILES_DIRS = [BASE_DIR / 'static']
+# Directory where `collectstatic` will copy files for production
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 

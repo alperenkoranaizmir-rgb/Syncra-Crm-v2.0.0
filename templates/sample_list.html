@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Örnek Kayıtlar - Syncra CRM{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Örnek Kayıtlar</h3>
+    </div>
+    <div class="card-body">
+        <ul class="list-group">
+            {% for it in items %}
+            <li class="list-group-item">
+                <a href="{% url 'core:sample_detail' it.id %}">{{ it.name }}</a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}
