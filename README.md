@@ -12,6 +12,29 @@ Gereksinimler
 - (Opsiyonel) `virtualenv` veya `venv`
  - Proje bağımlılıkları `requirements.txt` dosyasında listelenir. Yeni bir paket eklediğinizde önce bu dosyaya ekleyin ve ardından `pip install -r requirements.txt` çalıştırın.
 
+Kurulan paketler
+- Aşağıdaki paketler sanal ortamda kuruldu ve `requirements.txt` içine kaydedildi. Tam listeyi proje kökünden `requirements.txt` dosyasında bulabilirsiniz.
+
+- Öne çıkan paketler:
+   - `Django==5.2.8` (proje için minimum `Django>=5.0,<6` uyumluluğu sağlandı)
+   - `requests` (>=2.28)
+   - `celery` (>=5.2)
+   - `django-celery-beat` (>=2.4)
+   - `WeasyPrint` (>=59.0)
+   - `redis` ve `channels`/`channels_redis`
+   - `psycopg` / `psycopg2-binary` (Postgres client)
+   - `djangorestframework`, `django-filter`, `django-extensions` ve test paketleri (`pytest`, `pytest-django`)
+
+- Notlar:
+   - `django-adminlte4-theme` paketi PyPI'de bulunamadı; ancak `django-adminlte4` başarıyla kuruldu. Eğer özel bir tema paketi gerekiyorsa paket adını veya kaynağını kontrol edin.
+   - `WeasyPrint` sistem düzeyinde bazı kütüphanelere ihtiyaç duyabilir (ör. `libpango`, `libcairo`, `libgdk-pixbuf`). Eğer PDF oluşturma sırasında hata alırsanız, sistem bağımlılıklarını aşağıdaki gibi yüklemeniz gerekebilir (Debian/Ubuntu örneği):
+
+```bash
+sudo apt update
+sudo apt install -y build-essential libpango1.0-0 libcairo2 libgdk-pixbuf2.0-0 libffi-dev libxml2 libxslt1.1
+```
+
+   - Yeni paket ekledikten sonra sanal ortamda `pip install paket_adı` çalıştırıp `pip freeze > requirements.txt` ile güncelleme yapın.
 Hızlı kurulum
 1. Depoyu klonlayın veya proje dizinine geçin:
 
