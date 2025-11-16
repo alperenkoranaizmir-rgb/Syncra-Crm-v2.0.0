@@ -3,12 +3,15 @@ import json
 from pathlib import Path
 
 from django import forms
+from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.shortcuts import render
 
 from proje.models import Agreement, Document, Owner, Ownership, Project, Unit
+
+from .utils import generate_report_path
 
 
 @admin.register(Project)
@@ -83,6 +86,12 @@ class OwnerAdmin(admin.ModelAdmin):
                         }
                     )
 
+            # if no report_file provided but we have report_rows, generate auto-named path
+            if not report_file and report_rows:
+                report_file = generate_report_path(
+                    prefix="reports/owners_assign", ext=report_format
+                )
+
             # write report if requested
             if report_file:
                 p = Path(report_file)
@@ -104,6 +113,7 @@ class OwnerAdmin(admin.ModelAdmin):
             )
 
             # Render a result page with report rows and optional download link
+            media_url = getattr(settings, "MEDIA_URL", "")
             context = {
                 "opts": self.model._meta,
                 "report_rows": report_rows,
@@ -111,6 +121,7 @@ class OwnerAdmin(admin.ModelAdmin):
                 "report_format": report_format,
                 "group": group,
                 "dry_run": dry_run,
+                "media_url": media_url,
             }
             return render(request, "admin/proje/owner_assign_result.html", context)
 

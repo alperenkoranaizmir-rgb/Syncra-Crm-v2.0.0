@@ -4,6 +4,8 @@ from pathlib import Path
 
 from django.core.management.base import BaseCommand, CommandError
 
+from proje.utils import generate_report_path
+
 
 class Command(BaseCommand):
     help = (
@@ -132,6 +134,12 @@ class Command(BaseCommand):
                             }
                         )
 
+            # if no report_file requested but we have report_rows, auto-generate filename
+            if not report_file and report_rows:
+                report_file = generate_report_path(
+                    prefix="reports/proje_assign", ext=report_format
+                )
+
             # write report if requested
             if report_file:
                 p = Path(report_file)
@@ -196,6 +204,12 @@ class Command(BaseCommand):
                         }
                     )
 
+            # if no report_file requested but we have report_rows, auto-generate filename
+            if not report_file and report_rows:
+                report_file = generate_report_path(
+                    prefix="reports/proje_assign", ext=report_format
+                )
+
             # write report if requested
             if report_file:
                 p = Path(report_file)
@@ -253,6 +267,12 @@ class Command(BaseCommand):
             )
             # Use plain write to avoid type issues in static analysis
             self.stdout.write(f"Added user {user} to group '{group_name}'\n")
+
+        # if no report_file requested but we have report_rows, auto-generate filename
+        if not report_file and report_rows:
+            report_file = generate_report_path(
+                prefix="reports/proje_assign", ext=report_format
+            )
 
         if report_file:
             p = Path(report_file)
