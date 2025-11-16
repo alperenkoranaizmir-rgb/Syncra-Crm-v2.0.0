@@ -30,6 +30,9 @@ class OwnerAdmin(admin.ModelAdmin):
     # Provide an action form to pick a group
     class GroupAssignActionForm(forms.Form):
         group = forms.ModelChoiceField(queryset=Group.objects.all(), required=True)
+        upload_s3 = forms.BooleanField(required=False, initial=False)
+        s3_bucket = forms.CharField(required=False)
+        s3_public = forms.BooleanField(required=False, initial=False)
 
     action_form = GroupAssignActionForm
 
@@ -45,6 +48,9 @@ class OwnerAdmin(admin.ModelAdmin):
             dry_run = request.POST.get("dry_run") == "on"
             report_file = request.POST.get("report_file") or ""
             report_format = request.POST.get("report_format") or "csv"
+            upload_s3 = request.POST.get("upload_s3") == "on"
+            s3_bucket = request.POST.get("s3_bucket") or None
+            s3_public = request.POST.get("s3_public") == "on"
 
             group = Group.objects.filter(pk=group_pk).first()
             if not group:
@@ -123,19 +129,32 @@ class OwnerAdmin(admin.ModelAdmin):
                     with target_path.open("w", encoding="utf-8") as outfh:
                         json.dump(report_rows, outfh, ensure_ascii=False, indent=2)
 
-            # prepare download URL if file is under MEDIA_ROOT and MEDIA_URL set
+            # Optionally upload to S3
+            report_s3_url = None
+            if report_file and upload_s3:
+                try:
+                    from .utils import upload_file_to_s3
+
+                    bucket = s3_bucket or getattr(settings, "REPORTS_S3_BUCKET", None)
+                    res = upload_file_to_s3(
+                        target_path, bucket=bucket, public=s3_public
+                    )
+                    report_s3_url = res.get("url")
+                except Exception:
+                    report_s3_url = None
+
+            # prepare download URL if file is under MEDIA_ROOT
             report_file_url = None
-            media_url = getattr(settings, "MEDIA_URL", "")
             media_root = getattr(settings, "MEDIA_ROOT", None)
             if report_file and media_root:
                 try:
-                    # if we wrote under MEDIA_ROOT, create a URL relative to MEDIA_URL
-                    rel = Path(report_file)
-                    if not rel.is_absolute():
-                        rel = Path(report_file)
-                    # When target_path was set above it points to actual file; compute relpath
                     relpath = Path(target_path).relative_to(media_root)
-                    report_file_url = str(Path(media_url) / relpath).replace("\\", "/")
+                    # Use admin-facing download view
+                    from django.urls import reverse
+
+                    report_file_url = reverse(
+                        "proje:report_download", args=[str(relpath)]
+                    )
                 except Exception:
                     report_file_url = None
 
@@ -151,6 +170,7 @@ class OwnerAdmin(admin.ModelAdmin):
                 "report_rows": report_rows,
                 "report_file": report_file,
                 "report_file_url": report_file_url,
+                "report_s3_url": report_s3_url,
                 "report_format": report_format,
                 "group": group,
                 "dry_run": dry_run,

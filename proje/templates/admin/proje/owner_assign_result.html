@@ -9,7 +9,7 @@
     {% if report_file_url %}
       <p>Download: <a href="{{ report_file_url }}" class="button">Download report</a></p>
     {% else %}
-      <p>If your server serves `MEDIA_ROOT` at `MEDIA_URL` you may download the file from there.</p>
+      <p>Download not available (file outside MEDIA_ROOT or MEDIA_ROOT not configured).</p>
     {% endif %}
   {% endif %}
 

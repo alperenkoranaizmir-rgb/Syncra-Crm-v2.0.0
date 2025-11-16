@@ -48,6 +48,26 @@ class Command(BaseCommand):
             help="Report file format when --report-file is used (csv or json)",
         )
         parser.add_argument(
+            "--upload-s3",
+            action="store_true",
+            help="Upload generated report to S3 (bucket must be provided via --s3-bucket or settings)",
+        )
+        parser.add_argument(
+            "--s3-bucket",
+            type=str,
+            help="S3 bucket to upload the report to (overrides settings.REPORTS_S3_BUCKET)",
+        )
+        parser.add_argument(
+            "--s3-key",
+            type=str,
+            help="S3 object key to use for the uploaded report (by default filename is used)",
+        )
+        parser.add_argument(
+            "--s3-public",
+            action="store_true",
+            help="Make uploaded S3 object public and return a public URL instead of a presigned URL",
+        )
+        parser.add_argument(
             "--label",
             type=str,
             help="Optional label to include in auto-generated report filename (e.g. project code)",
@@ -63,6 +83,10 @@ class Command(BaseCommand):
         report_file = options.get("report_file")
         report_format = options.get("report_format")
         label = options.get("label")
+        upload_s3 = options.get("upload_s3")
+        s3_bucket = options.get("s3_bucket")
+        s3_key = options.get("s3_key")
+        s3_public = options.get("s3_public")
 
         # helper to resolve user by username or email
         def _find_user(User, ident: str):
@@ -173,6 +197,26 @@ class Command(BaseCommand):
                     with target_path.open("w", encoding="utf-8") as outfh:
                         json.dump(report_rows, outfh, ensure_ascii=False, indent=2)
 
+                # Optionally upload to S3
+                if upload_s3:
+                    try:
+                        from proje.utils import upload_file_to_s3
+
+                        bucket = s3_bucket
+                        # If bucket not provided via arg, try settings
+                        if not bucket:
+                            bucket = getattr(
+                                __import__("django.conf").conf.settings,
+                                "REPORTS_S3_BUCKET",
+                                None,
+                            )
+                        res = upload_file_to_s3(
+                            target_path, bucket=bucket, key=s3_key, public=s3_public
+                        )
+                        self.stdout.write(f"Uploaded report to S3: {res.get('url')}\n")
+                    except Exception as exc:  # pragma: no cover - best-effort upload
+                        self.stderr.write(f"Failed to upload report to S3: {exc}\n")
+
             if dry_run:
                 self.stdout.write(f"[dry-run] Processed CSV {file_path}\n")
             else:
@@ -254,6 +298,25 @@ class Command(BaseCommand):
                     with target_path.open("w", encoding="utf-8") as outfh:
                         json.dump(report_rows, outfh, ensure_ascii=False, indent=2)
 
+                # Optionally upload to S3
+                if upload_s3:
+                    try:
+                        from proje.utils import upload_file_to_s3
+
+                        bucket = s3_bucket
+                        if not bucket:
+                            bucket = getattr(
+                                __import__("django.conf").conf.settings,
+                                "REPORTS_S3_BUCKET",
+                                None,
+                            )
+                        res = upload_file_to_s3(
+                            target_path, bucket=bucket, key=s3_key, public=s3_public
+                        )
+                        self.stdout.write(f"Uploaded report to S3: {res.get('url')}\n")
+                    except Exception as exc:  # pragma: no cover - best-effort upload
+                        self.stderr.write(f"Failed to upload report to S3: {exc}\n")
+
             self.stdout.write(f"Assigned {assigned} users from list\n")
             return
 
@@ -327,3 +390,22 @@ class Command(BaseCommand):
             else:
                 with target_path.open("w", encoding="utf-8") as outfh:
                     json.dump(report_rows, outfh, ensure_ascii=False, indent=2)
+
+            # Optionally upload to S3
+            if upload_s3:
+                try:
+                    from proje.utils import upload_file_to_s3
+
+                    bucket = s3_bucket
+                    if not bucket:
+                        bucket = getattr(
+                            __import__("django.conf").conf.settings,
+                            "REPORTS_S3_BUCKET",
+                            None,
+                        )
+                    res = upload_file_to_s3(
+                        target_path, bucket=bucket, key=s3_key, public=s3_public
+                    )
+                    self.stdout.write(f"Uploaded report to S3: {res.get('url')}\n")
+                except Exception as exc:  # pragma: no cover - best-effort upload
+                    self.stderr.write(f"Failed to upload report to S3: {exc}\n")

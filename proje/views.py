@@ -1,4 +1,8 @@
+from pathlib import Path
+
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.http import FileResponse, Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.views import generic
@@ -138,6 +142,50 @@ def document_upload(request, project_pk=None, unit_pk=None):
     else:
         form = DocumentForm(initial={"project": project_pk, "unit": unit_pk})
     return render(request, "proje/document_form.html", {"form": form})
+
+
+@login_required
+def report_download(request, filename):
+    """Serve a report file from MEDIA_ROOT/reports/ for staff users.
+
+    URL pattern passes a relative `filename` (may include subdirs). We ensure the
+    resolved path is under MEDIA_ROOT/reports to prevent traversal.
+    """
+    if not (request.user.is_staff or request.user.is_superuser):
+        from django.http import HttpResponseForbidden
+
+        return HttpResponseForbidden()
+
+    media_root = getattr(settings, "MEDIA_ROOT", None)
+    if not media_root:
+        raise Http404("Reports not available (MEDIA_ROOT not configured)")
+
+    base = Path(media_root)
+    target = base / filename
+    try:
+        target_resolved = target.resolve()
+    except Exception:
+        raise Http404("Invalid file")
+
+    try:
+        base_resolved = base.resolve()
+    except Exception:
+        raise Http404("Invalid media root")
+
+    if (
+        base_resolved not in target_resolved.parents
+        and base_resolved != target_resolved.parent
+        and base_resolved != target_resolved
+    ):
+        # ensure target is inside media_root
+        raise Http404("File not found")
+
+    if not target_resolved.exists() or not target_resolved.is_file():
+        raise Http404("File not found")
+
+    return FileResponse(
+        open(target_resolved, "rb"), as_attachment=True, filename=target_resolved.name
+    )
 
 
 class DocumentListView(generic.ListView):

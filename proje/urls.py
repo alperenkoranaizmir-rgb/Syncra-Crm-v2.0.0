@@ -22,4 +22,9 @@ urlpatterns = [
         name="document_upload",
     ),
     path("documents/", views.DocumentListView.as_view(), name="documents"),
+    path(
+        "reports/download/<path:filename>/",
+        views.report_download,
+        name="report_download",
+    ),
 ]
