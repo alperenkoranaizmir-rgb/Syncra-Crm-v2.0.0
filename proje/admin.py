@@ -92,20 +92,52 @@ class OwnerAdmin(admin.ModelAdmin):
                     prefix="reports/owners_assign", ext=report_format
                 )
 
+            # If admin didn't provide a path, auto-generate one using admin username
+            if not report_file and report_rows:
+                report_file = generate_report_path(
+                    prefix="reports/owners_assign",
+                    ext=report_format,
+                    label=getattr(request.user, "username", None),
+                )
+
             # write report if requested
             if report_file:
-                p = Path(report_file)
-                p.parent.mkdir(parents=True, exist_ok=True)
+                # If report_file is absolute, write there; otherwise write under MEDIA_ROOT
+                target_path = Path(report_file)
+                if not target_path.is_absolute():
+                    media_root = getattr(settings, "MEDIA_ROOT", None)
+                    if media_root:
+                        target_path = Path(media_root) / report_file
+                    else:
+                        target_path = Path(report_file)
+
+                target_path.parent.mkdir(parents=True, exist_ok=True)
                 if report_format == "csv":
                     keys = ["ident", "user", "group", "status"]
-                    with p.open("w", newline="", encoding="utf-8") as outfh:
+                    with target_path.open("w", newline="", encoding="utf-8") as outfh:
                         writer = csv.DictWriter(outfh, fieldnames=keys)
                         writer.writeheader()
                         for r in report_rows:
                             writer.writerow({k: r.get(k, "") for k in keys})
                 else:
-                    with p.open("w", encoding="utf-8") as outfh:
+                    with target_path.open("w", encoding="utf-8") as outfh:
                         json.dump(report_rows, outfh, ensure_ascii=False, indent=2)
+
+            # prepare download URL if file is under MEDIA_ROOT and MEDIA_URL set
+            report_file_url = None
+            media_url = getattr(settings, "MEDIA_URL", "")
+            media_root = getattr(settings, "MEDIA_ROOT", None)
+            if report_file and media_root:
+                try:
+                    # if we wrote under MEDIA_ROOT, create a URL relative to MEDIA_URL
+                    rel = Path(report_file)
+                    if not rel.is_absolute():
+                        rel = Path(report_file)
+                    # When target_path was set above it points to actual file; compute relpath
+                    relpath = Path(target_path).relative_to(media_root)
+                    report_file_url = str(Path(media_url) / relpath).replace("\\", "/")
+                except Exception:
+                    report_file_url = None
 
             self.message_user(
                 request,
@@ -118,6 +150,7 @@ class OwnerAdmin(admin.ModelAdmin):
                 "opts": self.model._meta,
                 "report_rows": report_rows,
                 "report_file": report_file,
+                "report_file_url": report_file_url,
                 "report_format": report_format,
                 "group": group,
                 "dry_run": dry_run,

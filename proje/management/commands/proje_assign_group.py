@@ -47,6 +47,11 @@ class Command(BaseCommand):
             default="csv",
             help="Report file format when --report-file is used (csv or json)",
         )
+        parser.add_argument(
+            "--label",
+            type=str,
+            help="Optional label to include in auto-generated report filename (e.g. project code)",
+        )
 
     def handle(self, *args, **options):
         username = options.get("username")
@@ -57,6 +62,7 @@ class Command(BaseCommand):
         dry_run = options.get("dry_run")
         report_file = options.get("report_file")
         report_format = options.get("report_format")
+        label = options.get("label")
 
         # helper to resolve user by username or email
         def _find_user(User, ident: str):
@@ -140,19 +146,31 @@ class Command(BaseCommand):
                     prefix="reports/proje_assign", ext=report_format
                 )
 
-            # write report if requested
+            # if no explicit report_file provided but we have report_rows, auto-generate into MEDIA_ROOT
+            if not report_file and report_rows:
+                report_file = generate_report_path(
+                    prefix="reports/proje_assign",
+                    ext=report_format,
+                    label=label or group_global,
+                )
+
             if report_file:
-                p = Path(report_file)
-                p.parent.mkdir(parents=True, exist_ok=True)
+                media_root = getattr(
+                    __import__("django.conf").conf.settings, "MEDIA_ROOT", None
+                )
+                target_path = Path(report_file)
+                if not target_path.is_absolute() and media_root:
+                    target_path = Path(media_root) / report_file
+                target_path.parent.mkdir(parents=True, exist_ok=True)
                 if report_format == "csv":
                     keys = ["ident", "user", "group", "status", "reason"]
-                    with p.open("w", newline="", encoding="utf-8") as outfh:
+                    with target_path.open("w", newline="", encoding="utf-8") as outfh:
                         writer = csv.DictWriter(outfh, fieldnames=keys)
                         writer.writeheader()
                         for r in report_rows:
                             writer.writerow({k: r.get(k, "") for k in keys})
                 else:
-                    with p.open("w", encoding="utf-8") as outfh:
+                    with target_path.open("w", encoding="utf-8") as outfh:
                         json.dump(report_rows, outfh, ensure_ascii=False, indent=2)
 
             if dry_run:
@@ -211,18 +229,29 @@ class Command(BaseCommand):
                 )
 
             # write report if requested
+            # if no explicit report_file provided but we have report_rows, auto-generate into MEDIA_ROOT
+            if not report_file and report_rows:
+                report_file = generate_report_path(
+                    prefix="reports/proje_assign", ext=report_format, label=label
+                )
+
             if report_file:
-                p = Path(report_file)
-                p.parent.mkdir(parents=True, exist_ok=True)
+                media_root = getattr(
+                    __import__("django.conf").conf.settings, "MEDIA_ROOT", None
+                )
+                target_path = Path(report_file)
+                if not target_path.is_absolute() and media_root:
+                    target_path = Path(media_root) / report_file
+                target_path.parent.mkdir(parents=True, exist_ok=True)
                 if report_format == "csv":
                     keys = ["ident", "user", "group", "status"]
-                    with p.open("w", newline="", encoding="utf-8") as outfh:
+                    with target_path.open("w", newline="", encoding="utf-8") as outfh:
                         writer = csv.DictWriter(outfh, fieldnames=keys)
                         writer.writeheader()
                         for r in report_rows:
                             writer.writerow({k: r.get(k, "") for k in keys})
                 else:
-                    with p.open("w", encoding="utf-8") as outfh:
+                    with target_path.open("w", encoding="utf-8") as outfh:
                         json.dump(report_rows, outfh, ensure_ascii=False, indent=2)
 
             self.stdout.write(f"Assigned {assigned} users from list\n")
@@ -274,16 +303,27 @@ class Command(BaseCommand):
                 prefix="reports/proje_assign", ext=report_format
             )
 
+        # if no explicit report_file provided but we have report_rows, auto-generate into MEDIA_ROOT
+        if not report_file and report_rows:
+            report_file = generate_report_path(
+                prefix="reports/proje_assign", ext=report_format, label=label
+            )
+
         if report_file:
-            p = Path(report_file)
-            p.parent.mkdir(parents=True, exist_ok=True)
+            media_root = getattr(
+                __import__("django.conf").conf.settings, "MEDIA_ROOT", None
+            )
+            target_path = Path(report_file)
+            if not target_path.is_absolute() and media_root:
+                target_path = Path(media_root) / report_file
+            target_path.parent.mkdir(parents=True, exist_ok=True)
             if report_format == "csv":
                 keys = ["ident", "user", "group", "status"]
-                with p.open("w", newline="", encoding="utf-8") as outfh:
+                with target_path.open("w", newline="", encoding="utf-8") as outfh:
                     writer = csv.DictWriter(outfh, fieldnames=keys)
                     writer.writeheader()
                     for r in report_rows:
                         writer.writerow({k: r.get(k, "") for k in keys})
             else:
-                with p.open("w", encoding="utf-8") as outfh:
+                with target_path.open("w", encoding="utf-8") as outfh:
                     json.dump(report_rows, outfh, ensure_ascii=False, indent=2)

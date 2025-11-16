@@ -6,7 +6,11 @@
 
   {% if report_file %}
     <p>Report written to: <strong>{{ report_file }}</strong></p>
-    <p>If your server serves static/media files from project root you may download it directly.</p>
+    {% if report_file_url %}
+      <p>Download: <a href="{{ report_file_url }}" class="button">Download report</a></p>
+    {% else %}
+      <p>If your server serves `MEDIA_ROOT` at `MEDIA_URL` you may download the file from there.</p>
+    {% endif %}
   {% endif %}
 
   <table class="table">
