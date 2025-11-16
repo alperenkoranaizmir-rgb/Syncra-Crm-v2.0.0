@@ -193,3 +193,13 @@ pre-commit install
 ```
 
 CI çalıştırıldığında testler ve statik toplama otomatik olarak doğrulanır.
+
+## Proje Dokümantasyonu (ek dosyalar)
+
+- `PROGRAM_ASAMASI.md`: Projenin program aşamaları ve adım adım yapılan işler.
+- `YAPILAN_ISLER.md`: Bu çalışma sırasında yapılan ana değişikliklerin özeti.
+- `HATALAR.md`: Tespit edilen hatalar ve çözümleri (çözülenleri işaretlenmiş).
+- `TEMPLATES.md`: `templates/` dizinindeki önemli şablonların açıklamaları ve kullanımları.
+- `TODO.md`: Bu zamana kadar oluşturduğum görev listesi ve durumları; ileride tamamlananları buradan güncelleyeceğim.
+
+Dokümanlar repoda root dizininde yer almaktadır. Projeyi klonladıktan sonra bu dosyaları okuyarak yapılan işleri ve kalan görevleri hızlıca görebilirsiniz.
