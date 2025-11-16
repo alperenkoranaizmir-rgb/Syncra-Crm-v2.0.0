@@ -29,6 +29,14 @@ class ProjectCreateView(generic.CreateView):
     template_name = "proje/project_form.html"
     success_url = reverse_lazy("proje:project_list")
 
+    # Only superusers can create new projects (per requirement)
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated or not request.user.is_superuser:
+            from django.http import HttpResponseForbidden
+
+            return HttpResponseForbidden("Sadece yönetici yeni proje oluşturabilir.")
+        return super().dispatch(request, *args, **kwargs)
+
 
 class ProjectUpdateView(generic.UpdateView):
     model = Project
@@ -45,6 +53,11 @@ class ProjectDetailView(generic.DetailView):
 @login_required
 def owner_create(request, project_pk):
     project = get_object_or_404(Project, pk=project_pk)
+    # Only project members (or superuser) can add owners
+    if not user_is_project_member(request.user, project.pk):
+        from django.http import HttpResponseForbidden
+
+        return HttpResponseForbidden("Bu proje için yetkiniz yok.")
     if request.method == "POST":
         form = OwnerForm(request.POST, request.FILES)
         if form.is_valid():
@@ -60,6 +73,11 @@ def owner_create(request, project_pk):
 @login_required
 def unit_create(request, project_pk):
     project = get_object_or_404(Project, pk=project_pk)
+    # Only project members (or superuser) can add units
+    if not user_is_project_member(request.user, project.pk):
+        from django.http import HttpResponseForbidden
+
+        return HttpResponseForbidden("Bu proje için yetkiniz yok.")
     if request.method == "POST":
         form = UnitForm(request.POST)
         if form.is_valid():
@@ -75,6 +93,11 @@ def unit_create(request, project_pk):
 @login_required
 def agreement_create(request, unit_pk):
     unit = get_object_or_404(Unit, pk=unit_pk)
+    # Only project members (or superuser) can add agreements
+    if not user_is_project_member(request.user, unit.project.pk):
+        from django.http import HttpResponseForbidden
+
+        return HttpResponseForbidden("Bu proje için yetkiniz yok.")
     if request.method == "POST":
         form = AgreementForm(request.POST)
         if form.is_valid():
@@ -87,6 +110,21 @@ def agreement_create(request, unit_pk):
 
 @login_required
 def document_upload(request, project_pk=None, unit_pk=None):
+    # Check membership based on project or unit
+    if project_pk:
+        if not user_is_project_member(request.user, project_pk):
+            from django.http import HttpResponseForbidden
+
+            return HttpResponseForbidden("Bu proje için yetkiniz yok.")
+    if unit_pk:
+        try:
+            unit = Unit.objects.get(pk=unit_pk)
+        except Exception:
+            unit = None
+        if unit and not user_is_project_member(request.user, unit.project.pk):
+            from django.http import HttpResponseForbidden
+
+            return HttpResponseForbidden("Bu proje için yetkiniz yok.")
     if request.method == "POST":
         form = DocumentForm(request.POST, request.FILES)
         if form.is_valid():
