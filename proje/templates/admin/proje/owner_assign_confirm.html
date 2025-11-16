@@ -1,0 +1,45 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block content %}
+  <h1>Assign selected owners to Group</h1>
+
+  <form method="post">
+    {% csrf_token %}
+    <p>Selected owners:</p>
+    <ul>
+      {% for owner in owners %}
+        <li>{{ owner }} — {{ owner.email }}</li>
+        <input type="hidden" name="_selected_action" value="{{ owner.pk }}" />
+      {% endfor %}
+    </ul>
+
+    <fieldset class="module aligned">
+      <div>
+        <label>Group:</label>
+        {{ group_form.group }}
+      </div>
+      <div>
+        <label>Dry run:</label>
+        <input type="checkbox" name="dry_run" />
+      </div>
+      <div>
+        <label>Report file (optional):</label>
+        <input type="text" name="report_file" placeholder="reports/owners_assign.csv" size="60" />
+      </div>
+      <div>
+        <label>Report format:</label>
+        <select name="report_format">
+          <option value="csv">CSV</option>
+          <option value="json">JSON</option>
+        </select>
+      </div>
+    </fieldset>
+
+    <p>
+      <input type="submit" name="confirm" value="Confirm and execute" class="default" />
+      <a href="..">Cancel</a>
+    </p>
+  </form>
+
+{% endblock %}
