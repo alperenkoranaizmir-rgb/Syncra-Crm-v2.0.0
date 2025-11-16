@@ -1,0 +1,13 @@
+{
+  "todos": [
+    { "id": 1, "title": "AdminLTE demo şablonları ekleme", "description": "templates/pages/ altında demo sayfaları eklendi.", "status": "completed" },
+    { "id": 2, "title": "DataTables pixel-perfect", "description": "DataTables Buttons, TR dil ayarları ve CSS overrides eklendi.", "status": "completed" },
+    { "id": 3, "title": "ChartJS demo düzenleme", "description": "Area/Doughnut chart init ve CSS overrides eklendi.", "status": "completed" },
+    { "id": 4, "title": "FullCalendar entegrasyonu", "description": "TR locale, toolbar ve CSS overrides eklendi.", "status": "completed" },
+    { "id": 5, "title": "Gallery (Ekko Lightbox)", "description": "Galeri grid ve lightbox init eklendi.", "status": "completed" },
+    { "id": 6, "title": "Mailbox UI", "description": "Inbox layout, compose modal ve JS eklendi.", "status": "completed" },
+    { "id": 7, "title": "Dashboard pixel-perfect", "description": "Dashboard'un final pixel-perfect düzeltmeleri (devam ediyor)", "status": "in-progress" },
+    { "id": 8, "title": "Statik çakışma politikası", "description": "collectstatic duplicate-destination politikası belirleme ve uygulama.", "status": "not-started" },
+    { "id": 9, "title": "Uzak repoya final push/PR", "description": "Son kontrol ve PR hazırlama.", "status": "completed" }
+  ]
+}

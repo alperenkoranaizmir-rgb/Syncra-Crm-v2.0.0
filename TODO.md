@@ -1,32 +1,24 @@
 # TODO (Canlı Liste)
 
-Bu dosya, şu ana kadar yapmış olduğum görevlerin kısa bir listesini ve durumlarını gösterir. Bundan sonra her büyük adım tamamlandığında bu dosyayı da güncelleyeceğim.
+Bu dosya otomatik olarak `scripts/todo_state.json` dosyasından üretilir.
 
 ## Tamamlanan (✔)
 
-- ✔ AdminLTE demo şablonlarının çoğunun projeye eklenmesi (`templates/pages/`).
-- ✔ `core` uygulamasında demo rotalarının eklenmesi ve temel view'lerin oluşturulması.
-- ✔ `README.md` ve proje başlangıç yönergelerinin eklenmesi.
-- ✔ CI workflow (`.github/workflows/ci.yml`) ve pre-commit ayarlarının eklenmesi.
-- ✔ DataTables sayfası — Buttons ve Türkçe çeviri, CSS overrides.
-- ✔ ChartJS sayfası — gradient area, donut legend, collapse tool, CSS overrides.
-- ✔ FullCalendar sayfası — Türkçe locale, toolbar, CSS overrides.
-- ✔ Gallery — Ekko Lightbox grid ve CSS overrides.
-- ✔ Mailbox — inbox layout, compose modal, küçük JS ve CSS overrides.
+- ✔ AdminLTE demo şablonları ekleme — templates/pages/ altında demo sayfaları eklendi.
+- ✔ DataTables pixel-perfect — DataTables Buttons, TR dil ayarları ve CSS overrides eklendi.
+- ✔ ChartJS demo düzenleme — Area/Doughnut chart init ve CSS overrides eklendi.
+- ✔ FullCalendar entegrasyonu — TR locale, toolbar ve CSS overrides eklendi.
+- ✔ Gallery (Ekko Lightbox) — Galeri grid ve lightbox init eklendi.
+- ✔ Mailbox UI — Inbox layout, compose modal ve JS eklendi.
+- ✔ Uzak repoya final push/PR — Son kontrol ve PR hazırlama.
 
-## Devam Eden / Yapılacak (—)
+## Devam Eden / Yapılmakta
 
-- — Dashboard için detaylı pixel-perfect düzeltmeler (renkler, margin, tipografi)  
-- — Statik duplicate-destination politikası: hangi kaynağın tercih edileceğinin belirlenmesi ve uygulanması  
-- — Tüm demo sayfalar için eksik plugin init'lerinin kontrolü ve örnek verilerle zenginleştirme  
-- — Uzak repoya final push ve PR açılması (isteğe bağlı: release tag'ı oluşturma)
+- ⏳ Dashboard pixel-perfect — Dashboard'un final pixel-perfect düzeltmeleri (devam ediyor)
 
-## Önerilen Öncelik Sırası
+## Beklemede / Başlanmamış
 
-1. Dashboard pixel-perfect tamamlama
-2. Statik çakışma politikasını belirleme ve uygulama
-3. Demo sayfaların son konsolidasyonu (grafik örnekleri, tablo verileri)
-4. Push → PR süreci ve CI doğrulama
+- ☐ Statik çakışma politikası — collectstatic duplicate-destination politikası belirleme ve uygulama.
 
 ---
-Bu dosya proje ilerledikçe güncellenecektir.
+Bu dosya otomatik olarak güncellenebilir: `python scripts/update_todo_md.py set <id> <completed|in-progress|not-started>`

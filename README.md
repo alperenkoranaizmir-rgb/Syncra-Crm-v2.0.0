@@ -203,3 +203,98 @@ CI çalıştırıldığında testler ve statik toplama otomatik olarak doğrulan
 - `TODO.md`: Bu zamana kadar oluşturduğum görev listesi ve durumları; ileride tamamlananları buradan güncelleyeceğim.
 
 Dokümanlar repoda root dizininde yer almaktadır. Projeyi klonladıktan sonra bu dosyaları okuyarak yapılan işleri ve kalan görevleri hızlıca görebilirsiniz.
+
+## Detaylı Kurulum & Deploy Rehberi
+
+Aşağıdaki adımlar geliştirme ve üretim (deploy) için yaygın bir yol sağlar. Ortama özel ayarlarınız varsa uygun şekilde uyarlayın.
+
+1) Yerel geliştirme ortamı (quickstart)
+
+```bash
+# proje köküne geçin
+cd /path/to/Syncra-Crm-v2.0.0
+
+# virtualenv oluşturup etkinleştir
+python3 -m venv .venv
+source .venv/bin/activate
+
+# bağımlılıkları yükle
+pip install --upgrade pip
+pip install -r requirements.txt
+
+# veritabanı migrate ve süper kullanıcı
+python manage.py migrate
+python manage.py createsuperuser
+
+# statik dosyaları topla (geliştirme için opsiyonel)
+python manage.py collectstatic --noinput
+
+# geliştirme sunucusunu çalıştır
+python manage.py runserver
+
+# Tarayıcıda http://127.0.0.1:8000/ adresini açın
+```
+
+2) Sistem bağımlılıkları (WeasyPrint gibi native paketler gerekebilir)
+
+Debian/Ubuntu örneği:
+
+```bash
+sudo apt update
+sudo apt install -y build-essential libpango1.0-0 libcairo2 libgdk-pixbuf2.0-0 libffi-dev libxml2 libxslt1.1
+```
+
+3) Üretim için temel adımlar (Gunicorn + nginx örneği)
+
+- Ortam değişkenlerini ayarlayın (`.env` veya systemd unit içinde): `DEBUG=False`, `SECRET_KEY`, `DATABASE_URL` veya DB ayrıntıları, `ALLOWED_HOSTS`.
+- Sanal ortamı oluşturun ve bağımlılıkları yükleyin.
+- Veritabanı migrate edin: `python manage.py migrate`.
+- Statik dosyaları toplayın: `python manage.py collectstatic --noinput`.
+
+Örnek systemd servis (gunicorn) — `/etc/systemd/system/syncra-gunicorn.service`:
+
+```ini
+[Unit]
+Description=gunicorn daemon for Syncra CRM
+After=network.target
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/path/to/Syncra-Crm-v2.0.0
+EnvironmentFile=/path/to/Syncra-Crm-v2.0.0/.env
+ExecStart=/path/to/Syncra-Crm-v2.0.0/.venv/bin/gunicorn config.wsgi:application \
+  --workers 3 --bind unix:/run/syncra.sock
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Örnek nginx site konfigürasyonu (proxy to gunicorn):
+
+```nginx
+server {
+   listen 80;
+   server_name your.domain.com;
+
+   location = /favicon.ico { access_log off; log_not_found off; }
+   location /static/ {
+      root /path/to/Syncra-Crm-v2.0.0/staticfiles;
+   }
+
+   location / {
+      include proxy_params;
+      proxy_pass http://unix:/run/syncra.sock;
+   }
+}
+```
+
+4) Güvenlik & performans ipuçları
+- `DEBUG=False` yapın ve `ALLOWED_HOSTS`'ı ayarlayın.
+- HTTPS kullanın (Let's Encrypt + certbot önerilir).
+- Veritabanı bağlantı bilgilerini güvenli şekilde yönetin (`.env` veya secret manager).
+- Statik ve medya dosyalarını CDN veya S3 benzeri servislerde saklamayı düşünün.
+
+5) CI/CD notları
+- Repo'da `.github/workflows/ci.yml` bulunur; push/pull requestlerde `collectstatic` ve testleri çalıştırır.
+
