@@ -1,50 +1,23 @@
+{% extends 'adminlte/base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% block title %}Syncra CRM{% endblock %}</title>
 
-    <!-- Vendor CSS -->
-    <link rel="stylesheet" href="{% static 'vendor/bootstrap/bootstrap.min.css' %}">
+{% block title %}Syncra CRM{% endblock %}
+
+{# Inject local vendor CSS used by our templates (icons, overlayscrollbars) #}
+{% block extra_css %}
     <link rel="stylesheet" href="{% static 'vendor/bootstrap-icons/bootstrap-icons.css' %}">
     <link rel="stylesheet" href="{% static 'vendor/overlayscrollbars/overlayscrollbars.min.css' %}">
-    <link rel="stylesheet" href="{% static 'vendor/adminlte/adminlte.min.css' %}">
+    {{ block.super }}
+{% endblock %}
 
-    {% block extra_css %}{% endblock %}
-</head>
-<body class="hold-transition sidebar-mini layout-fixed">
-<div class="wrapper">
+{# Provide necessary JS hooks; adminlte/base.html will include its core scripts, we add local vendors #}
+{% block extra_js %}
+    <script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'vendor/bootstrap/popper.min.js' %}"></script>
+    <script src="{% static 'vendor/bootstrap/bootstrap.min.js' %}"></script>
+    <script src="{% static 'vendor/overlayscrollbars/overlayscrollbars.browser.es6.min.js' %}"></script>
+    <script src="{% static 'vendor/apexcharts/apexcharts.min.js' %}"></script>
+    {{ block.super }}
+{% endblock %}
 
-    {% include 'includes/navbar.html' %}
-    {% include 'includes/sidebar.html' %}
-
-    <!-- Content Wrapper. Contains page content -->
-    <div class="content-wrapper">
-        <!-- Main content -->
-        <section class="content">
-            <div class="container-fluid pt-3">
-                {% block content %}{% endblock %}
-            </div>
-        </section>
-        <!-- /.content -->
-    </div>
-    <!-- /.content-wrapper -->
-
-    {% include 'includes/footer.html' %}
-
-    {% include 'includes/control_sidebar.html' %}
-
-</div>
-
-<!-- Vendor JS -->
-<script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
-<script src="{% static 'vendor/bootstrap/popper.min.js' %}"></script>
-<script src="{% static 'vendor/bootstrap/bootstrap.min.js' %}"></script>
-<script src="{% static 'vendor/overlayscrollbars/overlayscrollbars.browser.es6.min.js' %}"></script>
-<script src="{% static 'vendor/adminlte/adminlte.min.js' %}"></script>
-
-{% block extra_js %}{% endblock %}
-</body>
-</html>
+{# Child templates should still implement a `content` block as before. #}
