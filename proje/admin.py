@@ -102,7 +102,17 @@ class OwnerAdmin(admin.ModelAdmin):
                 request,
                 f"Assigned {assigned} users to group '{group}' (dry-run={dry_run})",
             )
-            return None
+
+            # Render a result page with report rows and optional download link
+            context = {
+                "opts": self.model._meta,
+                "report_rows": report_rows,
+                "report_file": report_file,
+                "report_format": report_format,
+                "group": group,
+                "dry_run": dry_run,
+            }
+            return render(request, "admin/proje/owner_assign_result.html", context)
 
         # Otherwise render confirmation page
         context = {

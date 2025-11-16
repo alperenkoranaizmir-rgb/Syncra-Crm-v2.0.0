@@ -1,0 +1,35 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block content %}
+  <h1>Assignment Result</h1>
+
+  {% if report_file %}
+    <p>Report written to: <strong>{{ report_file }}</strong></p>
+    <p>If your server serves static/media files from project root you may download it directly.</p>
+  {% endif %}
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Ident</th>
+        <th>User</th>
+        <th>Group</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in report_rows %}
+        <tr>
+          <td>{{ r.ident }}</td>
+          <td>{{ r.user|default:"" }}</td>
+          <td>{{ r.group|default:"" }}</td>
+          <td>{{ r.status }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <p><a href="..">Back</a></p>
+
+{% endblock %}
