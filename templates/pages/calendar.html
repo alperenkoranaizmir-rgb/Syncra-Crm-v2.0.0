@@ -4,9 +4,16 @@
 {% block extra_css %}
   {{ block.super }}
   <link rel="stylesheet" href="{% static 'admin-lte/plugins/fullcalendar/main.min.css' %}">
+  <link rel="stylesheet" href="{% static 'css/calendar_overrides.css' %}">
 {% endblock %}
 {% block content %}
 <div class="card">
+  <div class="card-header">
+    <h3 class="card-title">Takvim</h3>
+    <div class="card-tools">
+      <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+    </div>
+  </div>
   <div class="card-body">
     <div id="calendar"></div>
   </div>
@@ -16,17 +23,28 @@
 {% block extra_js %}
   {{ block.super }}
   <script src="{% static 'admin-lte/plugins/fullcalendar/main.min.js' %}"></script>
+  <script src="{% static 'admin-lte/plugins/fullcalendar/locales-all.min.js' %}"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function(){
       var calendarEl = document.getElementById('calendar');
       var calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
-        height: 500,
+        height: 550,
+        locale: 'tr',
+        headerToolbar: {
+          left: 'prev,next today',
+          center: 'title',
+          right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+        },
+        selectable: true,
         events: [
-          { title: 'Toplantı', start: new Date().toISOString().slice(0,10) },
+          { title: 'Toplantı', start: new Date().toISOString().slice(0,10), className: 'bg-info' },
+          { title: 'Teslim', start: new Date(new Date().setDate(new Date().getDate()+3)).toISOString().slice(0,10), className: 'bg-success' }
         ]
       });
       calendar.render();
     });
   </script>
 {% endblock %}
+
+

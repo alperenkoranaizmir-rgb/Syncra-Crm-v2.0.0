@@ -1,0 +1,21 @@
+/* Calendar small visual tweaks to match AdminLTE demo */
+#calendar {
+  max-width: 100%;
+}
+
+.fc .fc-toolbar-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.fc .fc-daygrid-event .fc-event-title {
+  font-size: 0.9rem;
+}
+
+.card .card-body #calendar {
+  padding: 0.5rem;
+}
+
+@media (max-width: 576px) {
+  .fc .fc-toolbar-title { font-size: 0.95rem; }
+}
