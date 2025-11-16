@@ -1,9 +1,129 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}Mailbox{% endblock %}
+
+{% block extra_css %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'css/mailbox_overrides.css' %}">
+{% endblock %}
+
 {% block content %}
-<div class="card">
-  <div class="card-body">
-    <p>Mailbox list placeholder.</p>
+<div class="row">
+  <div class="col-md-3">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Posta</h3>
+      </div>
+      <div class="card-body">
+        <a href="#" class="btn btn-primary btn-block mb-3" data-toggle="modal" data-target="#composeModal">Yeni Mesaj</a>
+        <div class="list-group">
+          <a href="#" class="list-group-item list-group-item-action active">Gelen Kutusu <span class="badge badge-light float-right">12</span></a>
+          <a href="#" class="list-group-item list-group-item-action">Gönderilen</a>
+          <a href="#" class="list-group-item list-group-item-action">Taslaklar</a>
+          <a href="#" class="list-group-item list-group-item-action">Çöp</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-9">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Gelen Kutusu</h3>
+        <div class="card-tools">
+          <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+        </div>
+      </div>
+      <div class="card-body p-0">
+        <div class="mailbox-controls p-3">
+          <button class="btn btn-default btn-sm" id="btn-select-all"><i class="far fa-square"></i></button>
+          <div class="float-right">
+            <div class="btn-group">
+              <button class="btn btn-default btn-sm"><i class="fas fa-sync-alt"></i></button>
+            </div>
+          </div>
+        </div>
+
+        <div class="table-responsive mailbox-messages">
+          <table class="table table-hover table-striped">
+            <tbody>
+              <tr>
+                <td style="width:40px"><input type="checkbox" class="msg-check"></td>
+                <td class="mailbox-name"><a href="#">Bilgi@ornek.com</a></td>
+                <td class="mailbox-subject">[Projeler] Teslim planı <span class="text-muted">- Lütfen onaylayın</span></td>
+                <td class="mailbox-attachment"></td>
+                <td class="mailbox-date">2 saat</td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="msg-check"></td>
+                <td class="mailbox-name"><a href="#">Destek</a></td>
+                <td class="mailbox-subject">Hesap güncellemesi</td>
+                <td></td>
+                <td class="mailbox-date">1 gün</td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="msg-check"></td>
+                <td class="mailbox-name"><a href="#">Müşteri X</a></td>
+                <td class="mailbox-subject">Teklif isteği</td>
+                <td><i class="fas fa-paperclip"></i></td>
+                <td class="mailbox-date">3 gün</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
+
+<!-- Compose Modal -->
+<div class="modal fade" id="composeModal" tabindex="-1" aria-labelledby="composeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="composeModalLabel">Yeni Mesaj</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Kapat"><span aria-hidden="true">&times;</span></button>
+      </div>
+      <div class="modal-body">
+        <form id="composeForm">
+          <div class="form-group">
+            <input class="form-control" placeholder="Kime" name="to">
+          </div>
+          <div class="form-group">
+            <input class="form-control" placeholder="Konu" name="subject">
+          </div>
+          <div class="form-group">
+            <textarea class="form-control" rows="8" name="body" placeholder="Mesajınızı yazın..."></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">İptal</button>
+        <button type="button" class="btn btn-primary" id="sendMessage">Gönder</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+  {{ block.super }}
+  <script>
+    (function(){
+      // select / deselect all
+      document.getElementById('btn-select-all').addEventListener('click', function(){
+        var checks = document.querySelectorAll('.msg-check');
+        var anyUnchecked = Array.from(checks).some(function(c){ return !c.checked; });
+        checks.forEach(function(c){ c.checked = anyUnchecked; });
+      });
+
+      // simple send handler (demo)
+      document.getElementById('sendMessage').addEventListener('click', function(){
+        // here we'd post via AJAX; for demo just close modal and show toast
+        $('#composeModal').modal('hide');
+        if (window.syncraAlert) syncraAlert.toastSuccess('Mesaj gönderildi (demo)');
+      });
+    })();
+  </script>
 {% endblock %}

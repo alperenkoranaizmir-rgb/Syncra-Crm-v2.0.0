@@ -1,0 +1,12 @@
+/* Mailbox spacing and visual tweaks */
+.mailbox-controls .btn { margin-right: 6px; }
+.mailbox-messages tbody tr td { vertical-align: middle; }
+.mailbox-name a { font-weight: 600; color: #343a40; }
+.mailbox-subject { color: #6c757d; }
+.mailbox-date { white-space: nowrap; }
+
+.card .card-body .table { margin-bottom: 0; }
+
+@media (max-width: 576px) {
+  .mailbox-controls { padding: .5rem; }
+}
