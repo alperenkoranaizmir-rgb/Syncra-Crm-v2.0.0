@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}Form Doğrulama - Syncra CRM{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header"><h3 class="card-title">Form Doğrulama Örneği</h3></div>
+    <div class="card-body">
+        <form class="needs-validation" novalidate>
+            <div class="form-row">
+                <div class="col-md-6 mb-3">
+                    <label for="vname">Ad</label>
+                    <input type="text" class="form-control" id="vname" required>
+                    <div class="invalid-feedback">Lütfen adınızı girin.</div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="vemail">E-posta</label>
+                    <input type="email" class="form-control" id="vemail" required>
+                    <div class="invalid-feedback">Geçerli bir e-posta girin.</div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="vpass">Parola</label>
+                <input type="password" class="form-control" id="vpass" minlength="6" required>
+                <div class="invalid-feedback">Parola en az 6 karakter olmalıdır.</div>
+            </div>
+            <button class="btn btn-primary" type="submit">Gönder</button>
+        </form>
+    </div>
+</div>
+
+<script>
+// Client-side bootstrap validation (simple)
+(function(){
+  'use strict'
+  window.addEventListener('load', function() {
+    var forms = document.getElementsByClassName('needs-validation')
+    Array.prototype.filter.call(forms, function(form) {
+      form.addEventListener('submit', function(event) {
+        if (form.checkValidity() === false) {
+          event.preventDefault()
+          event.stopPropagation()
+        }
+        form.classList.add('was-validated')
+      }, false)
+    })
+  }, false)
+})()
+</script>
+
+{% endblock %}

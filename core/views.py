@@ -36,6 +36,21 @@ def sample_detail(request, pk):
     return render(request, 'sample_detail.html', {'item': item})
 
 
+@login_required
+def forms_general(request):
+    return render(request, 'forms/general.html')
+
+
+@login_required
+def forms_advanced(request):
+    return render(request, 'forms/advanced.html')
+
+
+@login_required
+def forms_validation(request):
+    return render(request, 'forms/validation.html')
+
+
 def handler404(request, exception=None):
     return render(request, '404.html', status=404)
 

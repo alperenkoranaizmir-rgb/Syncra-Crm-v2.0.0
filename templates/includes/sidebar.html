@@ -15,6 +15,32 @@
                         <p>Ana Panel</p>
                     </a>
                 </li>
+                <li class="nav-item has-treeview">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon bi bi-ui-checks-grid"></i>
+                        <p>Formlar <i class="right bi bi-caret-down-fill"></i></p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{% url 'core:forms_general' %}" class="nav-link">
+                                <i class="nav-icon bi bi-file-earmark-text"></i>
+                                <p>Genel Formlar</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url 'core:forms_advanced' %}" class="nav-link">
+                                <i class="nav-icon bi bi-sliders"></i>
+                                <p>Gelişmiş Formlar</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url 'core:forms_validation' %}" class="nav-link">
+                                <i class="nav-icon bi bi-check2-square"></i>
+                                <p>Doğrulama</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
                 <li class="nav-item">
                     <a href="{% url 'core:sample_list' %}" class="nav-link">
                         <i class="nav-icon bi bi-collection"></i>
