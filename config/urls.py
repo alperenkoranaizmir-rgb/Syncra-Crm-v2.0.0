@@ -14,15 +14,16 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.contrib import admin
-from django.urls import path, include
+
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib import admin
+from django.urls import include, path
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', include('core.urls', namespace='core')),
-    path('accounts/', include('django.contrib.auth.urls')),
+    path("admin/", admin.site.urls),
+    path("", include("core.urls", namespace="core")),
+    path("accounts/", include("django.contrib.auth.urls")),
 ]
 
 # Serve static in development
@@ -30,7 +31,7 @@ if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 # Custom error handlers
-handler404 = 'core.views.handler404'
-handler500 = 'core.views.handler500'
-handler403 = 'core.views.handler403'
-handler400 = 'core.views.handler400'
+handler404 = "core.views.handler404"
+handler500 = "core.views.handler500"
+handler403 = "core.views.handler403"
+handler400 = "core.views.handler400"

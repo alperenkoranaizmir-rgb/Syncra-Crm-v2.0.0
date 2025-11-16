@@ -176,3 +176,20 @@ Not: Bazı demo sayfalar placeholder olarak eklendi; isterseniz aşağıdaki ad�
 - Detaylı JS init ve stil düzeltmeleri (A).
 - Eksik plugin entegrasyonlarının tam ayarlanması (B).
 - `requirements.txt` güncellemesi pip-freeze çıktısıyla yapıldı (C).
+
+## CI & pre-commit
+
+Projeye temel bir CI workflow ve yerel pre-commit hook eklendi:
+
+- **GitHub Actions:** `.github/workflows/ci.yml` — push ve pull requestlerde çalışır; Python kurulumu, bağımlılıkların yüklenmesi, `collectstatic --noinput` ve `python manage.py test` adımlarını çalıştırır.
+- **Pre-commit:** `.pre-commit-config.yaml` — basit bir yerel hook olarak `python manage.py test` çalıştırır; kullanmak için `pip install pre-commit` ve `pre-commit install` komutlarını çalıştırın.
+
+Kullanım (yerel):
+
+```bash
+source .venv/bin/activate
+pip install pre-commit
+pre-commit install
+```
+
+CI çalıştırıldığında testler ve statik toplama otomatik olarak doğrulanır.
