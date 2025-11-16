@@ -5,6 +5,19 @@
 
 .dt-buttons .btn {
   margin-left: 6px;
+  /* Slightly smaller buttons to fit compact admin header */
+  font-size: 0.85rem;
+  padding: 0.28rem 0.5rem;
+  border-radius: 0.35rem;
+  color: #fff;
+  background-color: #007bff; /* AdminLTE/Bootstrap primary */
+  border: 1px solid rgba(0,0,0,0.08);
+}
+
+.dt-buttons .btn:hover, .dt-buttons .btn:focus {
+  background-color: #0069d9;
+  color: #fff;
+  text-decoration: none;
 }
 
 /* Align the table wrapper controls with the card header */
@@ -12,5 +25,8 @@
 
 /* Small responsive tweaks */
 @media (max-width: 576px) {
-  .dt-buttons { margin-top: 8px; }
+  .dt-buttons { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px; }
+  .dt-buttons .btn { font-size: 0.78rem; padding: 0.25rem 0.45rem; }
+  /* Make the dt-buttons container horizontally scrollable if too many buttons */
+  .dt-buttons { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 }
