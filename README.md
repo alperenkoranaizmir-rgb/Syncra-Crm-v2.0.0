@@ -10,6 +10,7 @@ Gereksinimler
 - Python 3.8+ (sanal ortam önerilir)
 - `pip`
 - (Opsiyonel) `virtualenv` veya `venv`
+ - Proje bağımlılıkları `requirements.txt` dosyasında listelenir. Yeni bir paket eklediğinizde önce bu dosyaya ekleyin ve ardından `pip install -r requirements.txt` çalıştırın.
 
 Hızlı kurulum
 1. Depoyu klonlayın veya proje dizinine geçin:
@@ -21,8 +22,11 @@ Hızlı kurulum
 2. Sanal ortam oluşturun ve etkinleştirin:
 
    ```bash
-   python -m venv .venv
+   python3 -m venv .venv
    source .venv/bin/activate
+   # Sanal ortam etkinleştirildikten sonra Django (ve diğer paketleri) yükleyin:
+   pip install "Django>=5.2"
+   pip install -r requirements.txt  # (varsa diğer paketleri yükler)
    ```
 
 3. Bağımlılıkları yükleyin (varsa `requirements.txt`):
@@ -39,6 +43,38 @@ Veritabanı ve başlangıç
 python manage.py migrate
 python manage.py createsuperuser
 ```
+
+Django dil (Türkçe) ayarları
+- Projede Django ayarlarını (`settings.py`) Türkçe yapmak için aşağıdaki ayarları ekleyin/güncelleyin:
+
+```python
+# settings.py
+LANGUAGE_CODE = 'tr'
+TIME_ZONE = 'Europe/Istanbul'
+USE_I18N = True
+USE_TZ = True
+# Locale dosyalarını tutmak isterseniz
+from pathlib import Path
+BASE_DIR = Path(__file__).resolve().parent.parent
+LOCALE_PATHS = [BASE_DIR / 'locale']
+```
+
+- Dil dosyalarını oluşturmak için:
+
+```bash
+python manage.py makemessages -l tr
+python manage.py compilemessages
+```
+
+- Not: Sisteminizde Türkçe locale yüklü değilse (`locale-gen tr_TR.UTF-8` gibi) ek olarak işletim sistemi düzeyinde locale eklemeniz gerekebilir.
+
+Bağımlılıklar
+- Projenin Python bağımlılıkları `requirements.txt` içinde saklanır. Yeni bir paket eklediğinizde önce sanal ortamda `pip install paket` çalıştırın, ardından güncel paket listesini kaydetmek için:
+
+```bash
+pip freeze > requirements.txt
+```
+
 
 Geliştirme sunucusunu çalıştırma
 ```bash
