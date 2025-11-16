@@ -198,6 +198,35 @@ CI çalıştırıldığında testler ve statik toplama otomatik olarak doğrulan
 
 - `PROGRAM_ASAMASI.md`: Projenin program aşamaları ve adım adım yapılan işler.
 - `YAPILAN_ISLER.md`: Bu çalışma sırasında yapılan ana değişikliklerin özeti.
+
+## Proje Yönetimi Modülü (Yeni)
+
+Yaptığım eklemelerle `proje` adlı yeni bir Django uygulaması eklendi. Bu modül kentsel dönüşüm projelerini yönetmek için temel CRUD ve belge yönetimi işlevlerini sağlar.
+
+- Uygulama: `proje`
+- Modeller: `Project`, `Owner` (Malik), `Unit` (Bağımsız Bölüm), `Ownership`, `Agreement`, `Document`.
+- URL alanı: `/proje/`
+- Örnek yollar:
+   - `/proje/` — Proje listesi
+   - `/proje/add/` — Yeni proje ekle
+   - `/proje/<pk>/` — Proje detay
+   - `/proje/<pk>/unit/add/` — Projeye bağımsız bölüm ekle
+   - `/proje/<pk>/owner/add/` — Projeye malik ekle
+   - `/proje/documents/` — Sistemdeki proje dosyaları
+
+Kullanım notları:
+- Uygulama Admin panelinden de yönetilebilir (`/admin/`).
+- Dosya yükleme alanları `MEDIA` ayarlarınıza göre çalışacaktır; geliştirme için Django'nun `MEDIA_URL`/`MEDIA_ROOT` yapılandırmasını kullanabilirsiniz.
+
+Test ve deploy:
+- Yeni migration'lar oluşturuldu ve `python manage.py migrate` çalıştırıldı.
+- Mevcut testler (`python manage.py test`) başarıyla geçti.
+
+Gelecek adımlar (opsiyonel):
+- Proje yetkilendirme (sadece proje staff/manager görüntüleyebilsin) ve granular izinler.
+- Dosya önizleme (PDF/imagen thumbnail) ve doküman arama.
+- Uzlaşma süreci için ayrıntılı durum izleme, bildirimler ve ilerleme göstergeleri.
+
 - `HATALAR.md`: Tespit edilen hatalar ve çözümleri (çözülenleri işaretlenmiş).
 - `TEMPLATES.md`: `templates/` dizinindeki önemli şablonların açıklamaları ve kullanımları.
 - `TODO.md`: Bu zamana kadar oluşturduğum görev listesi ve durumları; ileride tamamlananları buradan güncelleyeceğim.
