@@ -1,0 +1,36 @@
+.doc-thumb { 
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  cursor: pointer;
+}
+
+/* Lightbox overlay */
+.projadb-lightbox-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+.projadb-lightbox-content img {
+  max-width: 90vw;
+  max-height: 90vh;
+  border-radius: 6px;
+}
+.projadb-lightbox-close {
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  color: white;
+  font-size: 28px;
+  cursor: pointer;
+}
+
+/* Make admin inline table cells center small thumbnails */
+.inline-related .doc-thumb { margin: 4px 0; }

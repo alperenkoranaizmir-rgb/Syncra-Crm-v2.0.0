@@ -211,11 +211,21 @@ class DocumentInline(admin.TabularInline):
             return "-"
         url = getattr(obj.file, "url", None)
         name = obj.label or obj.file.name.split("/")[-1]
+        # Render a clickable thumbnail link when possible
         if url:
-            return format_html('<a href="{}" target="_blank">{}</a>', url, name)
+            return format_html(
+                '<a href="{}" class="doc-thumb-link" data-full="{}" target="_blank">{}</a>',
+                url,
+                url,
+                name,
+            )
         return name
 
     file_link.short_description = "Dosya"
+
+    class Media:
+        css = {"all": ("proje/admin/document_preview.css",)}
+        js = ("proje/admin/document_preview.js",)
 
 
 # attach inline to UnitAdmin
@@ -257,7 +267,11 @@ class DocumentAdmin(admin.ModelAdmin):
         url = getattr(obj.file, "url", None)
         # crude image detection by extension
         if url and str(obj.file.name).lower().endswith((".png", ".jpg", ".jpeg", ".gif", ".webp")):
-            return format_html('<img src="{}" style="max-height:150px; max-width:300px;" />', url)
+            # return a thumbnail image with class for CSS sizing and a link that opens lightbox
+            return format_html(
+                '<a href="{0}" class="doc-thumb-link" data-full="{0}"><img src="{0}" class="doc-thumb"/></a>',
+                url,
+            )
         # not an image -- show clickable name
         name = obj.label or obj.file.name.split("/")[-1]
         if url:
@@ -265,6 +279,10 @@ class DocumentAdmin(admin.ModelAdmin):
         return name
 
     preview.short_description = "Önizleme"
+
+    class Media:
+        css = {"all": ("proje/admin/document_preview.css",)}
+        js = ("proje/admin/document_preview.js",)
 
     class DocumentBulkUploadForm(forms.ModelForm):
         # We handle the files upload via request.FILES.getlist('files') in add_view,
