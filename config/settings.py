@@ -23,7 +23,25 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY: allow configuration via environment variables
 # In production set DJANGO_SECRET_KEY and DJANGO_DEBUG and DJANGO_ALLOWED_HOSTS
-SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', os.getenv('SECRET_KEY', token_urlsafe(50)))
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY') or os.getenv('SECRET_KEY')
+
+# Persist a generated secret locally so restarts don't invalidate sessions.
+if not SECRET_KEY:
+    secret_file = BASE_DIR / '.secret_key'
+    try:
+        if secret_file.exists():
+            SECRET_KEY = secret_file.read_text().strip()
+        else:
+            SECRET_KEY = token_urlsafe(50)
+            # write file with restrictive permissions
+            secret_file.write_text(SECRET_KEY)
+            try:
+                os.chmod(secret_file, 0o600)
+            except Exception:
+                pass
+    except Exception:
+        # fallback to in-memory secret if file IO fails
+        SECRET_KEY = token_urlsafe(50)
 
 # DEBUG from env (default True for development)
 DEBUG = os.getenv('DJANGO_DEBUG', 'True').lower() in ('1', 'true', 'yes')
@@ -35,19 +53,20 @@ ALLOWED_HOSTS = [h for h in os.getenv('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0
 # Application definition
 
 INSTALLED_APPS = [
+    # AdminLTE / theme apps (must come before django.contrib.admin)
+    'adminlte4',
+    'adminlte4_theme',
+    'django_adminlte4',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
     # Local apps
     'core',
-
-    # AdminLTE / theme apps
-    'adminlte4',
-    'adminlte4_theme',
-    'django_adminlte4',
 ]
 
 MIDDLEWARE = [

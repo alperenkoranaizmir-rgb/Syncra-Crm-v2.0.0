@@ -5,6 +5,10 @@
 
 {# Inject local vendor CSS used by our templates (icons, overlayscrollbars) #}
 {% block extra_css %}
+    {# Fallback favicon (SVG) served from static #}
+    <link rel="icon" type="image/svg+xml" href="{% static 'favicon.svg' %}">
+    {# Ensure FontAwesome (used by many AdminLTE examples) is available #}
+    <link rel="stylesheet" href="{% static 'admin-lte/plugins/fontawesome-free/css/all.min.css' %}">
     <link rel="stylesheet" href="{% static 'vendor/bootstrap-icons/bootstrap-icons.css' %}">
     <link rel="stylesheet" href="{% static 'vendor/overlayscrollbars/overlayscrollbars.min.css' %}">
     {{ block.super }}
