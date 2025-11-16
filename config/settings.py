@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 import os
 from pathlib import Path
+from secrets import token_urlsafe
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -22,9 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY: allow configuration via environment variables
 # In production set DJANGO_SECRET_KEY and DJANGO_DEBUG and DJANGO_ALLOWED_HOSTS
-SECRET_KEY = os.getenv('DJANGO_SECRET_KEY',
-                       os.getenv('SECRET_KEY',
-                                 'replace-me-with-env-or-set-very-long-secret'))
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', os.getenv('SECRET_KEY', token_urlsafe(50)))
 
 # DEBUG from env (default True for development)
 DEBUG = os.getenv('DJANGO_DEBUG', 'True').lower() in ('1', 'true', 'yes')
