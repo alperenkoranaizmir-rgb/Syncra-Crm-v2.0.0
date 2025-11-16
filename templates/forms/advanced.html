@@ -37,8 +37,12 @@
             </div>
             <div class="mt-3">
                 <button class="btn btn-success">Uygula</button>
+                <button type="button" class="btn btn-warning" onclick="syncraAlert.toastError('Bir hata oluştu')">Toast Hata</button>
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#syncraDemoModal">Modal Aç</button>
             </div>
         </form>
     </div>
 </div>
 {% endblock %}
+
+{% include 'includes/demo_modal.html' %}

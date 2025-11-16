@@ -32,6 +32,10 @@
     <script src="{% static 'admin-lte/plugins/daterangepicker/daterangepicker.js' %}"></script>
     <script src="{% static 'admin-lte/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js' %}"></script>
     {{ block.super }}
+    {# SweetAlert2 + Toastr for popup alerts like AdminLTE demo #}
+    <script src="{% static 'admin-lte/plugins/sweetalert2/sweetalert2.min.js' %}"></script>
+    <script src="{% static 'admin-lte/plugins/toastr/toastr.min.js' %}"></script>
+
     <script>
         (function(){
             // initialize common plugins used by form demos
@@ -44,6 +48,26 @@
             try { $(".colorpicker").each(function(){ $(this).colorpicker(); }); } catch(e) {}
             try { $(".datetimepicker").datetimepicker(); } catch(e) {}
             try { $("input[data-bootstrap-switch]").each(function(){ $(this).bootstrapSwitch('state', $(this).prop('checked')) }); } catch(e) {}
+
+            // Helper functions to show demo alerts
+            window.syncraAlert = {
+                toastSuccess: function(msg){
+                    toastr.success(msg, '', {positionClass: 'toast-top-right'});
+                },
+                toastError: function(msg){
+                    toastr.error(msg, '', {positionClass: 'toast-top-right'});
+                },
+                modalConfirm: function(title, text, callback){
+                    Swal.fire({
+                        title: title,
+                        text: text,
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonText: 'Evet',
+                        cancelButtonText: 'Hayır'
+                    }).then(function(result){ if (result.isConfirmed) callback(); });
+                }
+            };
         })();
     </script>
 {% endblock %}

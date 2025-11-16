@@ -57,8 +57,13 @@
             <div class="mt-3">
                 <button class="btn btn-primary">Kaydet</button>
                 <button class="btn btn-secondary">İptal</button>
+                <button type="button" class="btn btn-info" data-toggle="modal" data-target="#syncraDemoModal">Modal Örneği</button>
+                <button type="button" class="btn btn-success" onclick="syncraAlert.toastSuccess('Başarıyla kaydedildi')">Toast Başarılı</button>
+                <button type="button" class="btn btn-danger" onclick="syncraAlert.modalConfirm('Emin misiniz?','Bu işlemi onaylıyor musunuz?', function(){ syncraAlert.toastSuccess('Onaylandı'); })">Onay Popup</button>
             </div>
         </form>
     </div>
 </div>
 {% endblock %}
+
+{% include 'includes/demo_modal.html' %}
