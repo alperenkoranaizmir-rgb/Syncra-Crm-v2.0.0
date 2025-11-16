@@ -8,6 +8,7 @@ from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.shortcuts import render
+from django.utils.html import format_html
 
 from proje.models import Agreement, Document, Owner, Ownership, Project, Unit
 
@@ -197,6 +198,28 @@ class UnitAdmin(admin.ModelAdmin):
     search_fields = ("ada", "parsel", "address")
 
 
+class DocumentInline(admin.TabularInline):
+    model = Document
+    extra = 0
+    fields = ("file_link", "label", "uploaded_by", "uploaded_at")
+    readonly_fields = ("file_link", "uploaded_by", "uploaded_at")
+
+    def file_link(self, obj):
+        if not obj or not obj.file:
+            return "-"
+        url = getattr(obj.file, "url", None)
+        name = obj.label or obj.file.name.split("/")[-1]
+        if url:
+            return format_html('<a href="{}" target="_blank">{}</a>', url, name)
+        return name
+
+    file_link.short_description = "Dosya"
+
+
+# attach inline to UnitAdmin
+UnitAdmin.inlines = [DocumentInline]
+
+
 @admin.register(Ownership)
 class OwnershipAdmin(admin.ModelAdmin):
     list_display = ("unit", "owner", "share_percent", "status")
@@ -209,7 +232,21 @@ class AgreementAdmin(admin.ModelAdmin):
 
 @admin.register(Document)
 class DocumentAdmin(admin.ModelAdmin):
-    list_display = ("__str__", "project", "unit", "uploaded_by", "uploaded_at")
+    list_display = ("label", "file_link", "project", "unit", "uploaded_by", "uploaded_at")
+    readonly_fields = ("uploaded_at",)
+    search_fields = ("label", "file__icontains")
+    fields = ("label", "file", "project", "unit", "uploaded_by", "uploaded_at")
+
+    def file_link(self, obj):
+        if not obj or not obj.file:
+            return "-"
+        url = getattr(obj.file, "url", None)
+        name = obj.label or obj.file.name.split("/")[-1]
+        if url:
+            return format_html('<a href="{}" target="_blank">{}</a>', url, name)
+        return name
+
+    file_link.short_description = "Dosya"
 
     class DocumentBulkUploadForm(forms.ModelForm):
         # We handle the files upload via request.FILES.getlist('files') in add_view,
