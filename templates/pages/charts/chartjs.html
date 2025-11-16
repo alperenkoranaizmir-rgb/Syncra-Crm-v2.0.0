@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}ChartJS Demo{% endblock %}
 
@@ -8,6 +9,9 @@
     <div class="card">
       <div class="card-header">
         <h3 class="card-title">Area Chart</h3>
+        <div class="card-tools">
+          <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+        </div>
       </div>
       <div class="card-body">
         <canvas id="areaChart" style="height:250px"></canvas>
@@ -18,6 +22,9 @@
     <div class="card">
       <div class="card-header">
         <h3 class="card-title">Donut Chart</h3>
+        <div class="card-tools">
+          <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+        </div>
       </div>
       <div class="card-body">
         <canvas id="donutChart" style="height:250px"></canvas>
@@ -34,6 +41,11 @@
     // Area Chart
     (function(){
       var ctx = document.getElementById('areaChart').getContext('2d')
+      // create gradient fill similar to AdminLTE demo
+      var gradient = ctx.createLinearGradient(0,0,0,250)
+      gradient.addColorStop(0, 'rgba(60,141,188,0.6)')
+      gradient.addColorStop(1, 'rgba(60,141,188,0.1)')
+
       var areaChart = new Chart(ctx, {
         type: 'line',
         data: {
@@ -41,12 +53,23 @@
           datasets: [{
             label: 'Aylık Ziyaret',
             data: [30,45,28,80,40,60,70,55,50,65,75,90],
-            backgroundColor: 'rgba(60,141,188,0.4)',
+            backgroundColor: gradient,
             borderColor: 'rgba(60,141,188,1)',
+            borderWidth: 2,
+            pointRadius: 3,
             fill: true
           }]
         },
-        options: { responsive: true, maintainAspectRatio: false }
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { grid: { display: false } },
+            y: { beginAtZero: true }
+          },
+          elements: { line: { tension: 0.3 } }
+        }
       })
     })();
 
@@ -59,8 +82,17 @@
           labels: ['Tamamlandı','Devam Ediyor','Beklemede'],
           datasets: [{ data: [55,30,15], backgroundColor: ['#28a745','#ffc107','#dc3545'] }]
         },
-        options: { responsive: true, maintainAspectRatio: false }
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { position: 'bottom' } }
+        }
       })
     })();
   </script>
+{% endblock %}
+
+{% block extra_css %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'css/charts_overrides.css' %}">
 {% endblock %}

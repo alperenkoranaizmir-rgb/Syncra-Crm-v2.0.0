@@ -1,0 +1,24 @@
+/* Small Chart overrides to better match AdminLTE demo */
+.card .card-body canvas {
+  max-height: 320px;
+  width: 100% !important;
+}
+
+.card .card-body {
+  padding: 1rem 1rem;
+}
+
+/* Center donut legend and reduce margin */
+.chartjs-legend {
+  text-align: center;
+  margin-top: 0.5rem;
+}
+
+/* Slight card shadow & consistent spacing */
+.card {
+  border-radius: 0.35rem;
+}
+
+@media (max-width: 576px) {
+  .card .card-body canvas { max-height: 220px; }
+}
