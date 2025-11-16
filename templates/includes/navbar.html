@@ -20,7 +20,7 @@
         {% if request.user.is_authenticated %}
         <li class="nav-item dropdown">
             <a class="nav-link" data-toggle="dropdown" href="#" aria-expanded="false">
-                <img src="{% static 'vendor/adminlte/img/user2-160x160.jpg' %}" class="img-circle elevation-2" alt="User" style="width:24px;height:24px;"> {{ request.user.username }}
+                <i class="bi bi-person-circle" style="font-size:24px;vertical-align:middle;margin-right:6px"></i> {{ request.user.username }}
             </a>
             <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
                 <a href="{% url 'core:profile' %}" class="dropdown-item">Profil</a>
