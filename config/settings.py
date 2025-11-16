@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -19,13 +20,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-f3!)g9ku%wiwpu(um=wgmhxhjzn$h2b_qvpy+&fnn3le9dz24t'
+# SECURITY: allow configuration via environment variables
+# In production set DJANGO_SECRET_KEY and DJANGO_DEBUG and DJANGO_ALLOWED_HOSTS
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY',
+                       os.getenv('SECRET_KEY',
+                                 'replace-me-with-env-or-set-very-long-secret'))
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# DEBUG from env (default True for development)
+DEBUG = os.getenv('DJANGO_DEBUG', 'True').lower() in ('1', 'true', 'yes')
 
-ALLOWED_HOSTS = []
+# ALLOWED_HOSTS from env (comma separated) - defaults to localhost for dev
+ALLOWED_HOSTS = [h for h in os.getenv('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',') if h]
 
 
 # Application definition
@@ -135,3 +140,23 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Security-related settings: enable in production when DEBUG is False
+if not DEBUG:
+    # Redirect to HTTPS
+    SECURE_SSL_REDIRECT = True
+    # HSTS
+    SECURE_HSTS_SECONDS = int(os.getenv('SECURE_HSTS_SECONDS', '31536000'))
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    # Cookies secure
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    # Other recommended flags
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+else:
+    # Development-friendly defaults
+    SECURE_SSL_REDIRECT = False
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
