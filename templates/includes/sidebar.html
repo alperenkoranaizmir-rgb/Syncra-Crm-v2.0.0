@@ -73,6 +73,26 @@
                         </li>
                     </ul>
                 </li>
+                <li class="nav-item has-treeview">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fas fa-building"></i>
+                        <p>Proje Yönetimi <i class="right fas fa-caret-down"></i></p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{% url 'proje:project_list' %}" class="nav-link">
+                                <i class="nav-icon fas fa-list"></i>
+                                <p>Projeler</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url 'proje:documents' %}" class="nav-link">
+                                <i class="nav-icon fas fa-file"></i>
+                                <p>Dosyalar</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
             </ul>
         </nav>
         <!-- /.sidebar-menu -->

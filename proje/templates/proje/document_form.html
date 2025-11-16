@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}Dosya Yükle — Syncra{% endblock %}
+
+{% block content %}
+<section class="content">
+  <div class="container-fluid">
+    <div class="card">
+      <div class="card-body">
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          {{ form.as_p }}
+          <button class="btn btn-primary">Yükle</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

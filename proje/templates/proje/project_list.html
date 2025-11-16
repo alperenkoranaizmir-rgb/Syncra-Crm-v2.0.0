@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Projeler — Syncra{% endblock %}
+
+{% block content %}
+<section class="content">
+  <div class="container-fluid">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Projeler</h3>
+        <div class="card-tools">
+          <a href="{% url 'proje:project_add' %}" class="btn btn-primary">Yeni Proje Ekle</a>
+        </div>
+      </div>
+      <div class="card-body">
+        <table class="table table-striped">
+          <thead><tr><th>Kodu</th><th>Adı</th><th>Durum</th><th>Yönetici</th><th></th></tr></thead>
+          <tbody>
+            {% for p in object_list %}
+            <tr>
+              <td>{{ p.code }}</td>
+              <td><a href="{% url 'proje:project_detail' p.pk %}">{{ p.name }}</a></td>
+              <td>{{ p.get_status_display }}</td>
+              <td>{{ p.manager }}</td>
+              <td><a class="btn btn-sm btn-secondary" href="{% url 'proje:project_edit' p.pk %}">Düzenle</a></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5">Kayıt yok.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

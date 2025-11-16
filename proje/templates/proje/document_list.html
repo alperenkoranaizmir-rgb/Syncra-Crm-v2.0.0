@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}Projeye Ait Dosyalar — Syncra{% endblock %}
+
+{% block content %}
+<section class="content">
+  <div class="container-fluid">
+    <div class="card">
+      <div class="card-header"><h3 class="card-title">Dosyalar</h3></div>
+      <div class="card-body">
+        <ul>
+          {% for d in object_list %}
+            <li><a href="{{ d.file.url }}">{{ d }}</a> — {{ d.uploaded_at }}</li>
+          {% empty %}
+            <li>Dosya yok.</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

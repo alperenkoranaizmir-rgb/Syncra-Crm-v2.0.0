@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Proje Detay — Syncra{% endblock %}
+
+{% block content %}
+<section class="content">
+  <div class="container-fluid">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">{{ object.name }} ({{ object.code }})</h3>
+        <div class="card-tools">
+          <a href="{% url 'proje:owner_add' object.pk %}" class="btn btn-sm btn-success">Malik Ekle</a>
+          <a href="{% url 'proje:unit_add' object.pk %}" class="btn btn-sm btn-info">Bağımsız Bölüm Ekle</a>
+          <a href="{% url 'proje:document_upload' object.pk %}" class="btn btn-sm btn-warning">Dosya Yükle</a>
+        </div>
+      </div>
+      <div class="card-body">
+        <p><strong>Konum:</strong> {{ object.location }}</p>
+        <p><strong>Durum:</strong> {{ object.get_status_display }}</p>
+        <hr />
+        <h5>Malikler</h5>
+        <ul>
+          {% for m in object.owners.all %}
+            <li>{{ m.first_name }} {{ m.last_name }}</li>
+          {% empty %}
+            <li>Malik yok.</li>
+          {% endfor %}
+        </ul>
+
+        <h5>Bağımsız Bölümler</h5>
+        <ul>
+          {% for u in object.units.all %}
+            <li>{{ u }} - Uzlaşma: {{ u.get_agreement_status_display }}</li>
+          {% empty %}
+            <li>Bağımsız bölüm yok.</li>
+          {% endfor %}
+        </ul>
+
+        <h5>Dosyalar</h5>
+        <ul>
+          {% for d in object.documents.all %}
+            <li><a href="{{ d.file.url }}">{{ d }}</a> — {{ d.uploaded_at }}</li>
+          {% empty %}
+            <li>Dosya yok.</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
