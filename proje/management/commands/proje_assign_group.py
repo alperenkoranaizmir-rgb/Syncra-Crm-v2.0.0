@@ -20,6 +20,11 @@ class Command(BaseCommand):
             help="CSV file path for bulk assign. Columns: username or email; optional column 'group' or use --group",
         )
         parser.add_argument(
+            "--dry-run",
+            action="store_true",
+            help="Show what would be assigned without making changes",
+        )
+        parser.add_argument(
             "--users",
             type=str,
             help="Comma-separated list of usernames or emails to assign to --group",
@@ -31,6 +36,7 @@ class Command(BaseCommand):
 
         file_path = options.get("file")
         users_arg = options.get("users")
+        dry_run = options.get("dry_run")
 
         # Determine mode: single, bulk-by-list, or bulk-by-file
         if file_path:
@@ -64,9 +70,17 @@ class Command(BaseCommand):
                             self.stdout.write(f"User '{ident}' not found; skipping\n")
                             continue
                     group, _ = Group.objects.get_or_create(name=gname)
-                    group.user_set.add(user)
-                    assigned += 1
-            self.stdout.write(f"Assigned {assigned} users from {file_path}\n")
+                    if dry_run:
+                        self.stdout.write(
+                            f"[dry-run] Would add {user} to group '{gname}'\n"
+                        )
+                    else:
+                        group.user_set.add(user)
+                        assigned += 1
+            if dry_run:
+                self.stdout.write(f"[dry-run] Processed CSV {file_path}\n")
+            else:
+                self.stdout.write(f"Assigned {assigned} users from {file_path}\n")
             return
 
         if users_arg:
@@ -89,8 +103,13 @@ class Command(BaseCommand):
                         self.stdout.write(f"User '{ident}' not found; skipping\n")
                         continue
                 group, _ = Group.objects.get_or_create(name=group_name)
-                group.user_set.add(user)
-                assigned += 1
+                if dry_run:
+                    self.stdout.write(
+                        f"[dry-run] Would add {user} to group '{group_name}'\n"
+                    )
+                else:
+                    group.user_set.add(user)
+                    assigned += 1
             self.stdout.write(f"Assigned {assigned} users from list\n")
             return
 
@@ -115,6 +134,9 @@ class Command(BaseCommand):
                 raise CommandError(f"User '{username}' not found") from exc
 
         group, _ = Group.objects.get_or_create(name=group_name)
-        group.user_set.add(user)
-        # Use plain write to avoid type issues in static analysis
-        self.stdout.write(f"Added user {user} to group '{group_name}'\n")
+        if dry_run:
+            self.stdout.write(f"[dry-run] Would add {user} to group '{group_name}'\n")
+        else:
+            group.user_set.add(user)
+            # Use plain write to avoid type issues in static analysis
+            self.stdout.write(f"Added user {user} to group '{group_name}'\n")
