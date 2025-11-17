@@ -25,7 +25,7 @@ class Department(models.Model):
         verbose_name_plural = "Departmanlar"
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
 
 class Title(models.Model):
@@ -40,7 +40,7 @@ class Title(models.Model):
         verbose_name_plural = "Ünvanlar"
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
 
 class Profile(models.Model):
@@ -100,7 +100,8 @@ class Profile(models.Model):
         verbose_name_plural = "Kullanıcı Profilleri"
 
     def __str__(self):
-        return f"{self.user.get_full_name() or self.user.username}"
+        # ensure we always return a native str for linters and display
+        return str(self.user.get_full_name() or self.user.username)
 
     def save(self, *args, **kwargs):
         # Eğer iş çıkış tarihi varsa otomatik pasif yap
