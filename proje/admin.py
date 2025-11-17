@@ -21,6 +21,7 @@ from proje.models import Agreement, Document, Owner, Ownership, Project, Unit
 from .admin_helpers import (
     AdminBootstrapMixin,
     perform_owner_assignment,
+    process_bulk_document_upload,
     create_documents_from_files,
     build_document_return_url,
 )
@@ -303,26 +304,14 @@ class DocumentAdmin(AdminBootstrapMixin, admin.ModelAdmin):
 
     def add_view(self, request, form_url="", extra_context=None):
         """Custom add view to support multiple file uploads with optional labels."""
-        if request.method == "POST":
-            form = self.DocumentBulkUploadForm(request.POST, request.FILES)
-            if form.is_valid():
-                files = request.FILES.getlist("files")
-                labels_raw = form.cleaned_data.get("labels") or ""
-                labels = [ln.strip() for ln in labels_raw.splitlines() if ln.strip()]
-                project = form.cleaned_data.get("project")
-                unit = form.cleaned_data.get("unit")
-                uploaded_by = form.cleaned_data.get("uploaded_by") or request.user
-
-                created = create_documents_from_files(files, labels, project, unit, uploaded_by)
-
-                # After creation, redirect to the unit change page if `unit` is
-                # provided; otherwise send admin to the document changelist.
-                return_url = build_document_return_url(unit)
-
-                self.message_user(request, f"Yüklendi: {len(created)} dosya")
-                return redirect(return_url)
-        else:
-            form = self.DocumentBulkUploadForm()
+        # Delegate bulk upload handling to helper for clarity and testability
+        redirect_url, created_count_or_form = process_bulk_document_upload(
+            request, self.DocumentBulkUploadForm, self
+        )
+        if redirect_url:
+            return redirect(redirect_url)
+        # created_count_or_form is actually the form when redirect_url is falsy
+        form = created_count_or_form
 
         # Render custom template using the form (falls back to admin add template fields)
         context = dict(

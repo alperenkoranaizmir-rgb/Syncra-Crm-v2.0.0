@@ -5,18 +5,20 @@ for example widget class injection and report/upload helpers used by
 bulk actions.
 """
 
-from pathlib import Path
-from django.conf import settings
-from django import forms
-from django.contrib.auth import get_user_model
-from django.urls import reverse
-from proje.models import Document
 import csv
 import json
+from pathlib import Path
+
+from django.conf import settings
+from django import forms
+from django.contrib import messages
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
+from django.urls import reverse
+
+from proje.models import Document
 
 from .utils import upload_file_to_s3, generate_report_path
-from django.contrib import messages
-from django.contrib.auth.models import Group
 
 
 class AdminBootstrapMixin:
@@ -241,6 +243,30 @@ def build_document_return_url(unit):
     if unit:
         return reverse("admin:proje_unit_change", args=[unit.pk])
     return reverse("admin:proje_document_changelist")
+
+
+def process_bulk_document_upload(request, form_class, admin_instance):
+    """Handle bulk document upload form submission.
+
+    Returns a tuple `(redirect_url, created_count)` if upload succeeded and
+    the admin should redirect, otherwise returns `(None, form)` where
+    `form` is the (possibly unbound) form to render.
+    """
+    form = form_class(request.POST or None, request.FILES or None)
+    if request.method == "POST":
+        if form.is_valid():
+            files = request.FILES.getlist("files")
+            labels_raw = form.cleaned_data.get("labels") or ""
+            labels = [ln.strip() for ln in labels_raw.splitlines() if ln.strip()]
+            project = form.cleaned_data.get("project")
+            unit = form.cleaned_data.get("unit")
+            uploaded_by = form.cleaned_data.get("uploaded_by") or request.user
+
+            created = create_documents_from_files(files, labels, project, unit, uploaded_by)
+
+            admin_instance.message_user(request, f"Yüklendi: {len(created)} dosya")
+            return build_document_return_url(unit), len(created)
+    return None, form
 
 
 def parse_owner_assign_post(post_data):
