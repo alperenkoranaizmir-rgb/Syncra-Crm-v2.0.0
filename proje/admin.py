@@ -7,7 +7,7 @@ and includes styling hooks for AdminLTE/Bootstrap integration.
 
 from django import forms
 from django.contrib import admin
-from django.contrib.auth.models import Group
+# `Group` is not referenced directly in this module; kept import removed.
 from django.shortcuts import render, redirect
 from django.template.response import TemplateResponse
 
@@ -59,7 +59,7 @@ class OwnerAdmin(AdminBootstrapMixin, admin.ModelAdmin):
         # Otherwise render confirmation page
         context = {
             "owners": queryset,
-            "group_form": self.GroupAssignActionForm(),
+            "group_form": GroupAssignActionForm(),
             "opts": self.model._meta,  # pylint: disable=protected-access
             "action": "assign_group_to_owner_users",
         }
