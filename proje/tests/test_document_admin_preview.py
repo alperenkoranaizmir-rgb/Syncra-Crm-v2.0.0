@@ -3,6 +3,7 @@
 Verifies that image documents render an inline preview and that
 non-image documents render a link target.
 """
+# pylint: disable=missing-function-docstring
 
 import tempfile
 

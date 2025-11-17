@@ -84,3 +84,30 @@ Detaylı yapılan değişiklikler commit geçmişinde bulunmaktadır; hızlı ö
 
 ### Son Değişiklikler (2025-11-17):
 - style(admin): move admin forms to module and remove unused imports
+
+### Son Değişiklikler (2025-11-17):
+- accounts: add app, fix lint warnings, update .pylintrc; run tests locally
+
+### Son Değişiklikler (2025-11-17):
+- ci: quote python-version matrix entries to avoid numeric parsing issues
+
+### Son Değişiklikler (2025-11-17):
+- CI: fix requirements - relax boto3 pin to allow install on runners
+
+### Son Değişiklikler (2025-11-17):
+- accounts: ensure __str__ returns str (pylint fix)
+
+### Son Değişiklikler (2025-11-17):
+- proje: add docstrings, fix pylint naming and disable django-not-configured
+
+### Son Değişiklikler (2025-11-17):
+- accounts: cleanup create_accounts_defaults imports, docstring, fix unused vars and output formatting
+
+### Son Değişiklikler (2025-11-17):
+- tests: tidy imports, add module docstring and suppress test-only pylint warnings
+
+### Son Değişiklikler (2025-11-17):
+- tests: add module and class docstrings for document admin preview tests
+
+### Son Değişiklikler (2025-11-17):
+- scripts: rename User variable to user_model (pylint fix)

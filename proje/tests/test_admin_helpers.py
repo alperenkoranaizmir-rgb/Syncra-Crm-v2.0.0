@@ -25,6 +25,7 @@ User = get_user_model()
 
 
 class AdminHelpersTests(TestCase):
+    """Unit tests for `proje.admin_helpers` utilities."""
     def test_format_file_link_html_renders_link_and_metadata(self):
         tmpdir = tempfile.mkdtemp()
         with override_settings(MEDIA_ROOT=tmpdir, MEDIA_URL="/media/"):

@@ -116,6 +116,9 @@ class Command(BaseCommand):
         if not Document.objects.filter(label="demo_readme").exists():
             doc = Document(project=p1, label="demo_readme", uploaded_by=alice)
             with open(sample_path, "rb") as fh:
+                # FileField has a dynamic API provided by Django; static analyzers
+                # sometimes report 'no-member' for `.save`. Silence that here.
+                # pylint: disable=no-member
                 doc.file.save("demo_readme.txt", ContentFile(fh.read()), save=True)
 
         self.stdout.write(self.style.SUCCESS("Demo data loaded successfully."))
@@ -123,7 +126,8 @@ class Command(BaseCommand):
     def _clear_demo(self):
         # remove demo-created objects
         user_model = get_user_model()
-        user_model.objects.filter(username__endswith("_demo")).delete()
+        # Correct filter syntax: use keyword-style lookup
+        user_model.objects.filter(username__endswith="_demo").delete()
         Project.objects.filter(code__startswith="DEMO").delete()
         Document.objects.filter(label__in=("demo_readme",)).delete()
         Owner.objects.filter(email__endswith="@example.com").delete()

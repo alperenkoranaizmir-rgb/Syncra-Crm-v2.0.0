@@ -48,7 +48,7 @@ def main():
         issues = audit_file(p)
         if issues:
             report[str(p.relative_to(ROOT))] = issues
-    print("\nTemplate audit report: {} files with issues".format(len(report)))
+    print(f"\nTemplate audit report: {len(report)} files with issues")
     for f, issues in sorted(report.items()):
         print(f)
         for i in issues:

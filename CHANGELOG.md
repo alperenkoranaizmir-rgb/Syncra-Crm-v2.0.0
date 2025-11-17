@@ -84,3 +84,30 @@ Bu dosya proje içi önemli değişiklikleri kronolojik olarak kaydeder. `script
 
 ## 2025-11-17 07:51:27 UTC — style(admin): move admin forms to module and remove unused imports
 
+
+## 2025-11-17 08:52:57 UTC — accounts: add app, fix lint warnings, update .pylintrc; run tests locally
+
+
+## 2025-11-17 09:03:27 UTC — ci: quote python-version matrix entries to avoid numeric parsing issues
+
+
+## 2025-11-17 09:06:19 UTC — CI: fix requirements - relax boto3 pin to allow install on runners
+
+
+## 2025-11-17 09:09:17 UTC — accounts: ensure __str__ returns str (pylint fix)
+
+
+## 2025-11-17 09:09:35 UTC — proje: add docstrings, fix pylint naming and disable django-not-configured
+
+
+## 2025-11-17 09:09:51 UTC — accounts: cleanup create_accounts_defaults imports, docstring, fix unused vars and output formatting
+
+
+## 2025-11-17 09:10:04 UTC — tests: tidy imports, add module docstring and suppress test-only pylint warnings
+
+
+## 2025-11-17 09:10:20 UTC — tests: add module and class docstrings for document admin preview tests
+
+
+## 2025-11-17 09:10:31 UTC — scripts: rename User variable to user_model (pylint fix)
+

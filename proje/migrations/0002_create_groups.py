@@ -6,6 +6,7 @@ This migration creates two groups (`Proje Yöneticisi`,
 or Permission records are missing the migration will continue without
 raising so migrations can run in partial environments.
 """
+# pylint: disable=invalid-name,import-outside-toplevel
 
 from django.db import migrations
 
