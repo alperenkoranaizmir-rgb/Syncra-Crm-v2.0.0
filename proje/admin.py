@@ -5,8 +5,6 @@ This module centralizes admin UI tweaks (inlines, bulk upload, custom actions)
 and includes styling hooks for AdminLTE/Bootstrap integration.
 """
 
-import csv
-import json
 from pathlib import Path
 
 from django import forms
@@ -26,6 +24,7 @@ from .utils import generate_report_path
 
 @admin.register(Project)
 class ProjectAdmin(AdminBootstrapMixin, admin.ModelAdmin):
+    """Admin for `Project` model: list/filters and basic search configuration."""
     list_display = ("code", "name", "status", "manager")
     search_fields = ("code", "name", "location")
     list_filter = ("status", "type")
@@ -33,6 +32,7 @@ class ProjectAdmin(AdminBootstrapMixin, admin.ModelAdmin):
 
 @admin.register(Owner)
 class OwnerAdmin(AdminBootstrapMixin, admin.ModelAdmin):
+    """Admin for `Owner` model including bulk group-assign actions."""
     list_display = ("first_name", "last_name", "tc_no", "phone")
     search_fields = ("first_name", "last_name", "tc_no")
     actions = ["assign_group_to_owner_users"]
@@ -244,16 +244,19 @@ UnitAdmin.inlines = [DocumentInline]
 
 @admin.register(Ownership)
 class OwnershipAdmin(AdminBootstrapMixin, admin.ModelAdmin):
+    """Admin for `Ownership` model (unit-owner relationship)."""
     list_display = ("unit", "owner", "share_percent", "status")
 
 
 @admin.register(Agreement)
 class AgreementAdmin(AdminBootstrapMixin, admin.ModelAdmin):
+    """Admin for `Agreement` model (unit agreements)."""
     list_display = ("unit", "date", "status", "staff")
 
 
 @admin.register(Document)
 class DocumentAdmin(AdminBootstrapMixin, admin.ModelAdmin):
+    """Admin for `Document` model with preview and bulk upload support."""
     list_display = (
         "label",
         "file_link",
