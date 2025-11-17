@@ -67,6 +67,34 @@ python manage.py migrate
 python manage.py createsuperuser
 ```
 
+Otomatik Changelog Güncelleme
+- Lokal geliştirirken her commit'ten sonra bazı markdown dosyalarına (ör. `CHANGELOG.md`, `README.md`, `PROGRAM_ASAMASI.md`, `HATALAR.md`, `TEMPLATES.md`, `TODO.md`, `YAPILAN_ISLER.md`, `YAPILMASI_GEREKENLER.md`, `ONERILER.md`) otomatik bir kısa not eklemek isterseniz repo içindeki git hook şablonunu etkinleştirebilirsiniz.
+
+Etkinleştirme (bir defaya mahsus):
+```bash
+git config core.hooksPath .githooks
+chmod +x .githooks/post-commit
+```
+
+Bu işlemden sonra her commit'te `.githooks/post-commit` çalışacak ve `scripts/update_changelogs.py` script'ini çağırarak dosyalara bir "Son Değişiklikler" girdisi ekleyecektir. Manuel çalıştırmak için:
+
+```bash
+python3 scripts/update_changelogs.py "Kısa değişiklik açıklaması"
+```
+
+Not: Hook'lar yerel `.git/hooks` dizinine uygulanır; eğer CI ortamında otomatik güncelleme isterseniz CI adımlarınıza aynı script'i çağıran bir adım ekleyin.
+
+Kolay onboarding
+- Tüm ekip üyelerinin hook'u yerel olarak etkinleştirmesi için repoda bir yardımcı script mevcut: `scripts/onboard.sh`.
+- Kullanım (her geliştirici kendi makinesinde bir defaya mahsus):
+
+```bash
+chmod +x scripts/onboard.sh
+./scripts/onboard.sh
+```
+
+Bu komut `.githooks` içindeki hook'ları etkinleştirir ve post-commit işlemlerinin çalışmasını sağlar.
+
 Django dil (Türkçe) ayarları
 - Projede Django ayarlarını (`settings.py`) Türkçe yapmak için aşağıdaki ayarları ekleyin/güncelleyin:
 
@@ -327,3 +355,14 @@ server {
 5) CI/CD notları
 - Repo'da `.github/workflows/ci.yml` bulunur; push/pull requestlerde `collectstatic` ve testleri çalıştırır.
 
+### Son Değişiklikler (2025-11-17):
+- Seed changelog: pixel-perfect & admin updates
+
+### Son Değişiklikler (2025-11-17):
+- Hooks enabled: automatic changelog updates
+
+### Son Değişiklikler (2025-11-17):
+- Make script timezone-aware
+
+### Son Değişiklikler (2025-11-17):
+- ci: run changelog updater in CI; make script timezone-aware
