@@ -6,14 +6,9 @@ and includes styling hooks for AdminLTE/Bootstrap integration.
 """
 
 from django import forms
-from django.conf import settings
 from django.contrib import admin
-from django.contrib import messages
-
 from django.contrib.auth.models import Group
-from django.shortcuts import render
-from django.utils.html import format_html
-from django.shortcuts import redirect
+from django.shortcuts import render, redirect
 from django.template.response import TemplateResponse
 
 from proje.models import Agreement, Document, Owner, Ownership, Project, Unit
@@ -22,9 +17,10 @@ from .admin_helpers import (
     AdminBootstrapMixin,
     perform_owner_assignment,
     process_bulk_document_upload,
-    create_documents_from_files,
-    build_document_return_url,
+    format_file_link_html,
+    format_preview_html,
 )
+from .admin_forms import GroupAssignActionForm, DocumentBulkUploadForm
 
 
 @admin.register(Project)
@@ -43,30 +39,6 @@ class OwnerAdmin(AdminBootstrapMixin, admin.ModelAdmin):
     actions = ["assign_group_to_owner_users"]
 
     # Provide an action form to pick a group
-    class GroupAssignActionForm(forms.Form):
-        """Action form used by the OwnerAdmin.assign_group_to_owner_users action.
-
-        Allows picking a group, toggling S3 upload and providing an optional
-        report file path.
-        """
-        group = forms.ModelChoiceField(
-            queryset=Group.objects.all(),
-            required=True,
-        )
-        # Admin expects an 'action' field to exist; provide an empty ChoiceField
-        action = forms.ChoiceField(choices=(), required=False)
-        upload_s3 = forms.BooleanField(required=False, initial=False)
-        s3_bucket = forms.CharField(required=False)
-        s3_public = forms.BooleanField(required=False, initial=False)
-
-        def __init__(self, *args, **kwargs):
-            super().__init__(*args, **kwargs)
-            # add consistent classes to widgets
-            for _, field in self.fields.items():
-                widget = field.widget
-                css = widget.attrs.get("class", "")
-                widget.attrs["class"] = (css + " form-control").strip()
-
     action_form = GroupAssignActionForm
 
     @admin.action(description="Assign selected owners (by email) to a Group")
@@ -115,33 +87,8 @@ class DocumentInline(AdminBootstrapMixin, admin.TabularInline):
     show_change_link = True
 
     def file_link(self, obj):
-        """Return an HTML link or filename for the inline document preview."""
-        if not obj or not obj.file:
-            return "-"
-        url = getattr(obj.file, "url", None)
-        name = obj.label or obj.file.name.split("/")[-1]
-        # try to get file size and uploaded_by for metadata
-        size = None
-        uploader = None
-        try:
-            size = obj.file.size
-        except (AttributeError, OSError):
-            size = None
-        try:
-            if getattr(obj.uploaded_by, "get_full_name", None):
-                uploader = obj.uploaded_by.get_full_name()
-            else:
-                uploader = getattr(obj.uploaded_by, "username", None)
-        except AttributeError:
-            uploader = None
-        # Render a clickable thumbnail link when possible, including metadata attrs
-        if url:
-            tpl = (
-                '<a href="{}" class="doc-thumb-link" data-full="{}" '
-                'data-size="{}" data-uploader="{}" target="_blank">{}</a>'
-            )
-            return format_html(tpl, url, url, size or "", uploader or "", name)
-        return name
+        """Delegate inline file link rendering to helper."""
+        return format_file_link_html(obj)
 
     file_link.short_description = "Dosya"  # type: ignore[attr-defined]
 
@@ -196,67 +143,14 @@ class DocumentAdmin(AdminBootstrapMixin, admin.ModelAdmin):
     )
 
     def file_link(self, obj):
-        """Return an HTML link or filename for the document preview in list view."""
-        if not obj or not obj.file:
-            return "-"
-        url = getattr(obj.file, "url", None)
-        name = obj.label or obj.file.name.split("/")[-1]
-        size = None
-        uploader = None
-        try:
-            size = obj.file.size
-        except (AttributeError, OSError):
-            size = None
-        try:
-            if getattr(obj.uploaded_by, "get_full_name", None):
-                uploader = obj.uploaded_by.get_full_name()
-            else:
-                uploader = getattr(obj.uploaded_by, "username", None)
-        except AttributeError:
-            uploader = None
-        if url:
-            tpl = (
-                '<a href="{}" class="doc-thumb-link" data-full="{}" '
-                'data-size="{}" data-uploader="{}" target="_blank">{}</a>'
-            )
-            return format_html(tpl, url, url, size or "", uploader or "", name)
-        return name
+        """Delegate list view file link rendering to helper."""
+        return format_file_link_html(obj)
 
     file_link.short_description = "Dosya"  # type: ignore[attr-defined]
 
     def preview(self, obj):
-        """Show an image thumbnail for image files, or a file icon/name otherwise."""
-        if not obj or not obj.file:
-            return "-"
-        url = getattr(obj.file, "url", None)
-        # crude image detection by extension
-        if url:
-            fname = str(obj.file.name).lower()
-            if fname.endswith((".png", ".jpg", ".jpeg", ".gif", ".webp")):
-                # Include metadata attrs and return a thumbnail link (opens lightbox)
-                size = None
-                uploader = None
-                try:
-                    size = obj.file.size
-                except (AttributeError, OSError):
-                    size = None
-                try:
-                    if getattr(obj.uploaded_by, "get_full_name", None):
-                        uploader = obj.uploaded_by.get_full_name()
-                    else:
-                        uploader = getattr(obj.uploaded_by, "username", None)
-                except AttributeError:
-                    uploader = None
-                tpl = (
-                    '<a href="{}" class="doc-thumb-link" data-full="{}" '
-                    'data-size="{}" data-uploader="{}"><img src="{}" class="doc-thumb"/></a>'
-                )
-                return format_html(tpl, url, url, size or "", uploader or "", url)
-        # not an image -- show clickable name
-        name = obj.label or obj.file.name.split("/")[-1]
-        if url:
-            return format_html('<a href="{}" target="_blank">{}</a>', url, name)
-        return name
+        """Delegate preview rendering to helper."""
+        return format_preview_html(obj)
 
     preview.short_description = "Önizleme"  # type: ignore[attr-defined]
 
@@ -293,20 +187,14 @@ class DocumentAdmin(AdminBootstrapMixin, admin.ModelAdmin):
                 "uploaded_by",
             )
 
-        def __init__(self, *args, **kwargs):
-            super().__init__(*args, **kwargs)
-            # Add Bootstrap / AdminLTE classes to widgets for consistent styling
-            for _, field in self.fields.items():
-                widget = field.widget
-                css = widget.attrs.get("class", "")
-                classes = (css + " form-control").strip()
-                widget.attrs["class"] = classes
-
+    # Use the shared form definition from proje.admin_forms
+    # (keeps admin methods small and testable)
+    DocumentBulkUploadForm = DocumentBulkUploadForm
     def add_view(self, request, form_url="", extra_context=None):
         """Custom add view to support multiple file uploads with optional labels."""
         # Delegate bulk upload handling to helper for clarity and testability
         redirect_url, created_count_or_form = process_bulk_document_upload(
-            request, self.DocumentBulkUploadForm, self
+            request, DocumentBulkUploadForm, self
         )
         if redirect_url:
             return redirect(redirect_url)
