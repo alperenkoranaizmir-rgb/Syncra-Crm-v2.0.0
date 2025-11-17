@@ -81,57 +81,12 @@ class OwnerAdmin(AdminBootstrapMixin, admin.ModelAdmin):
         """
         # If this is the confirmation POST, perform assignment
         if request.method == "POST" and request.POST.get("confirm"):
-            # Parse POST once using helper to reduce inline locals and branching
-            params = parse_owner_assign_post(request.POST)
-
-            group = Group.objects.filter(pk=params["group_pk"]).first()
-            if not group:
-                self.message_user(request, "No group selected", level=messages.ERROR)
+            # Delegate POST processing to helper to reduce ModelAdmin complexity
+            result = perform_owner_assignment(request, queryset, self)
+            if result is None:
                 return None
-
-            report_rows, assigned = build_owner_assign_report(
-                queryset,
-                group,
-                dry_run=params["dry_run"],
-            )
-
-            # prepare, write and optionally upload the report; helper centralizes path
-            _target_path, report_file, report_file_url, report_s3_url = prepare_owner_report(
-                report_rows,
-                params["report_file"],
-                params["report_format"],
-                request.user,
-                upload_options={
-                    "upload_s3": params["upload_s3"],
-                    "s3_bucket": params["s3_bucket"],
-                    "s3_public": params["s3_public"],
-                },
-            )
-
-            msg = (
-                f"Assigned {assigned} users to group '{group}' "
-                f"(dry-run={params['dry_run']})"
-            )
-            self.message_user(request, msg)
-
-            # Build render context using helper
-            media_url = getattr(settings, "MEDIA_URL", "")
-            report_info = {
-                "report_rows": report_rows,
-                "report_file": report_file,
-                "report_file_url": report_file_url,
-                "report_s3_url": report_s3_url,
-                "report_format": params["report_format"],
-            }
-
-            context = build_owner_assign_context(
-                self.model._meta,  # pylint: disable=protected-access
-                report_info,
-                group,
-                params["dry_run"],
-                media_url,
-            )
-            return render(request, "admin/proje/owner_assign_result.html", context)
+            template_name, context = result
+            return render(request, template_name, context)
 
         # Otherwise render confirmation page
         context = {
@@ -195,6 +150,7 @@ class DocumentInline(AdminBootstrapMixin, admin.TabularInline):
     file_link.short_description = "Dosya"  # type: ignore[attr-defined]
 
     class Media:
+        """Media assets (CSS/JS) required by the Document inline preview UI."""
         css = {
             "all": (
                 "proje/admin/document_preview.css",
@@ -309,6 +265,7 @@ class DocumentAdmin(AdminBootstrapMixin, admin.ModelAdmin):
     preview.short_description = "Önizleme"  # type: ignore[attr-defined]
 
     class Media:
+        """Media assets (CSS/JS) required by the Document admin preview UI."""
         css = {
             "all": (
                 "proje/admin/document_preview.css",

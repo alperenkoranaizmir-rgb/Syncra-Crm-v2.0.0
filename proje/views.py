@@ -9,7 +9,7 @@ from pathlib import Path
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.http import FileResponse, Http404
+from django.http import FileResponse, Http404, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.views import generic
@@ -34,11 +34,22 @@ def user_is_project_member(user, project_id):
 
 
 class ProjectListView(generic.ListView):
+    """Display a paginated list of `Project` instances for the current user.
+
+    The view renders `proje/project_list.html` and provides the usual
+    context variables used by generic list views.
+    """
     model = Project
     template_name = "proje/project_list.html"
 
 
 class ProjectCreateView(generic.CreateView):
+    """CreateView to add a new `Project`.
+
+    Access is restricted inside the view to superusers only; non-superusers
+    receive a 403 response. Uses `ProjectForm` and redirects to the
+    project list on success.
+    """
     model = Project
     form_class = ProjectForm
     template_name = "proje/project_form.html"
@@ -47,13 +58,12 @@ class ProjectCreateView(generic.CreateView):
     # Only superusers can create new projects (per requirement)
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated or not request.user.is_superuser:
-            from django.http import HttpResponseForbidden
-
             return HttpResponseForbidden("Sadece yönetici yeni proje oluşturabilir.")
         return super().dispatch(request, *args, **kwargs)
 
 
 class ProjectUpdateView(generic.UpdateView):
+    """UpdateView for editing an existing `Project` instance."""
     model = Project
     form_class = ProjectForm
     template_name = "proje/project_form.html"
@@ -61,6 +71,7 @@ class ProjectUpdateView(generic.UpdateView):
 
 
 class ProjectDetailView(generic.DetailView):
+    """DetailView that shows full information about a single `Project`."""
     model = Project
     template_name = "proje/project_detail.html"
 
@@ -74,8 +85,6 @@ def owner_create(request, project_pk):
     project = get_object_or_404(Project, pk=project_pk)
     # Only project members (or superuser) can add owners
     if not user_is_project_member(request.user, project.pk):
-        from django.http import HttpResponseForbidden
-
         return HttpResponseForbidden("Bu proje için yetkiniz yok.")
     if request.method == "POST":
         form = OwnerForm(request.POST, request.FILES)
@@ -95,8 +104,6 @@ def unit_create(request, project_pk):
     project = get_object_or_404(Project, pk=project_pk)
     # Only project members (or superuser) can add units
     if not user_is_project_member(request.user, project.pk):
-        from django.http import HttpResponseForbidden
-
         return HttpResponseForbidden("Bu proje için yetkiniz yok.")
     if request.method == "POST":
         form = UnitForm(request.POST)
@@ -119,8 +126,6 @@ def agreement_create(request, unit_pk):
     unit = get_object_or_404(Unit, pk=unit_pk)
     # Only project members (or superuser) can add agreements
     if not user_is_project_member(request.user, unit.project.pk):
-        from django.http import HttpResponseForbidden
-
         return HttpResponseForbidden("Bu proje için yetkiniz yok.")
     if request.method == "POST":
         form = AgreementForm(request.POST)
@@ -141,8 +146,6 @@ def document_upload(request, project_pk=None, unit_pk=None):
     # Check membership based on project or unit
     if project_pk:
         if not user_is_project_member(request.user, project_pk):
-            from django.http import HttpResponseForbidden
-
             return HttpResponseForbidden("Bu proje için yetkiniz yok.")
     if unit_pk:
         try:
@@ -150,8 +153,6 @@ def document_upload(request, project_pk=None, unit_pk=None):
         except (Unit.DoesNotExist, ValueError, TypeError):
             unit = None
         if unit and not user_is_project_member(request.user, unit.project.pk):
-            from django.http import HttpResponseForbidden
-
             return HttpResponseForbidden("Bu proje için yetkiniz yok.")
     if request.method == "POST":
         form = DocumentForm(request.POST, request.FILES)
@@ -176,8 +177,6 @@ def report_download(request, filename):
     resolved path is under MEDIA_ROOT/reports to prevent traversal.
     """
     if not (request.user.is_staff or request.user.is_superuser):
-        from django.http import HttpResponseForbidden
-
         return HttpResponseForbidden()
 
     media_root = getattr(settings, "MEDIA_ROOT", None)
@@ -213,5 +212,10 @@ def report_download(request, filename):
 
 
 class DocumentListView(generic.ListView):
+    """ListView showing documents for a given project or unit.
+
+    The template `proje/document_list.html` should expect the standard
+    `object_list` context variable produced by Django generic views.
+    """
     model = Document
     template_name = "proje/document_list.html"

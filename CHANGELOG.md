@@ -54,3 +54,9 @@ Bu dosya proje içi önemli değişiklikleri kronolojik olarak kaydeder. `script
 
 ## 2025-11-17 05:14:12 UTC — chore(docs): add helper docstrings and utils module docstring; wrap long signature
 
+
+## 2025-11-17 05:41:17 UTC — chore(admin): split add_view, move imports, reduce pylint warnings
+
+
+## 2025-11-17 05:44:47 UTC — chore(migrations): docstrings and safer reverse delete handling for groups migration
+

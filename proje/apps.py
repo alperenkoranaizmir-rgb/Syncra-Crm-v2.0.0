@@ -21,9 +21,9 @@ class ProjeConfig(AppConfig):
 
     def ready(self):
         # Ensure groups exist when app is ready
-        from django.contrib.auth.models import Group
+        from django.contrib.auth.models import Group  # pylint: disable=import-outside-toplevel
         try:
-            from django.db.utils import OperationalError, ProgrammingError
+            from django.db.utils import OperationalError, ProgrammingError  # pylint: disable=import-outside-toplevel
         except Exception:  # pylint: disable=broad-except
             # If we cannot import DB exceptions, attempt to create groups but
             # guard broadly (this is a very early-import environment).

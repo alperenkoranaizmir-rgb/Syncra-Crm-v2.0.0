@@ -11,6 +11,12 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 from proje.models import Document
+import csv
+import json
+
+from .utils import upload_file_to_s3, generate_report_path
+from django.contrib import messages
+from django.contrib.auth.models import Group
 
 
 class AdminBootstrapMixin:
@@ -78,16 +84,12 @@ def save_report_rows(report_rows, report_file, report_format="csv"):
     if report_format == "csv":
         keys = ["ident", "user", "group", "status"]
         with target_path.open("w", newline="", encoding="utf-8") as outfh:
-            import csv
-
             writer = csv.DictWriter(outfh, fieldnames=keys)
             writer.writeheader()
             for r in report_rows:
                 writer.writerow({k: r.get(k, "") for k in keys})
     else:
         with target_path.open("w", encoding="utf-8") as outfh:
-            import json
-
             json.dump(report_rows, outfh, ensure_ascii=False, indent=2)
 
     return target_path
@@ -100,8 +102,6 @@ def upload_report_to_s3(target_path, bucket=None, public=False):
     and returns `None` on error.
     """
     try:
-        from .utils import upload_file_to_s3
-
         res = upload_file_to_s3(target_path, bucket=bucket, public=public)
         return res.get("url")
     except Exception:  # pragma: no cover - best-effort
@@ -185,8 +185,6 @@ def prepare_owner_report(
 
     # Auto-generate filename when missing. Include username when available.
     if not report_file and report_rows:
-        from .utils import generate_report_path
-
         report_file = generate_report_path(
             prefix="reports/owners_assign",
             ext=report_format,
@@ -289,3 +287,61 @@ def build_owner_assign_context(model_meta, report_info, group, dry_run, media_ur
         "dry_run": dry_run,
         "media_url": media_url,
     }
+
+
+def perform_owner_assignment(request, owners_queryset, admin_instance):
+    """Perform owner->user assignment flow and return template/context.
+
+    This helper parses the POST data, builds the report, optionally uploads
+    the report, records a user-facing message via `admin_instance.message_user`
+    and returns a tuple `(template_name, context)` suitable for rendering by
+    the caller. Returns `None` when an error already produced a message.
+    """
+    params = parse_owner_assign_post(request.POST)
+
+    group = Group.objects.filter(pk=params["group_pk"]).first()
+    if not group:
+        admin_instance.message_user(request, "No group selected", level=messages.ERROR)
+        return None
+
+    report_rows, assigned = build_owner_assign_report(
+        owners_queryset,
+        group,
+        dry_run=params["dry_run"],
+    )
+
+    _target_path, report_file, report_file_url, report_s3_url = prepare_owner_report(
+        report_rows,
+        params["report_file"],
+        params["report_format"],
+        request.user,
+        upload_options={
+            "upload_s3": params["upload_s3"],
+            "s3_bucket": params["s3_bucket"],
+            "s3_public": params["s3_public"],
+        },
+    )
+
+    msg = (
+        f"Assigned {assigned} users to group '{group}' "
+        f"(dry-run={params['dry_run']})"
+    )
+    admin_instance.message_user(request, msg)
+
+    media_url = getattr(settings, "MEDIA_URL", "")
+    report_info = {
+        "report_rows": report_rows,
+        "report_file": report_file,
+        "report_file_url": report_file_url,
+        "report_s3_url": report_s3_url,
+        "report_format": params["report_format"],
+    }
+
+    context = build_owner_assign_context(
+        admin_instance.model._meta,  # pylint: disable=protected-access
+        report_info,
+        group,
+        params["dry_run"],
+        media_url,
+    )
+    return ("admin/proje/owner_assign_result.html", context)

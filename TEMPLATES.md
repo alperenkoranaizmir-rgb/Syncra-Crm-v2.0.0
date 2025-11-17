@@ -73,3 +73,9 @@ Genel Kullanım Notları
 
 ### Son Değişiklikler (2025-11-17):
 - chore(docs): add helper docstrings and utils module docstring; wrap long signature
+
+### Son Değişiklikler (2025-11-17):
+- chore(admin): split add_view, move imports, reduce pylint warnings
+
+### Son Değişiklikler (2025-11-17):
+- chore(migrations): docstrings and safer reverse delete handling for groups migration
