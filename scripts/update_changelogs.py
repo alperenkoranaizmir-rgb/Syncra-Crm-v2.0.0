@@ -28,6 +28,10 @@ FILES_TO_UPDATE = [
 
 
 def get_message():
+    """Return a user-provided message or fall back to the last git commit message.
+
+    Priority: command-line arguments > last git commit message > manual marker.
+    """
     if len(sys.argv) > 1:
         return " ".join(sys.argv[1:]).strip()
     # try to get last git commit message
@@ -43,6 +47,10 @@ def get_message():
 
 
 def append_changelog(msg: str):
+    """Append a timestamped entry to the repository `CHANGELOG.md`.
+
+    The entry is prepended to the file (keeps existing content).
+    """
     ts = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
     entry = f"## {ts} — {msg}\n\n"
     # Prepend to CHANGELOG (keep existing content)
@@ -55,6 +63,10 @@ def append_changelog(msg: str):
 
 
 def update_md_files(msg: str):
+    """Insert a short 'Son Değişiklikler' note into each file in `FILES_TO_UPDATE`.
+
+    If a target file does not exist it will be created with a header and the note.
+    """
     note = f"\n### Son Değişiklikler ({datetime.now(timezone.utc).date()}):\n- {msg}\n"
     for f in FILES_TO_UPDATE:
         if not f.exists():
@@ -72,6 +84,7 @@ def update_md_files(msg: str):
 
 
 def main():
+    """Script entrypoint: determine message and update changelog and markdown files."""
     msg = get_message()
     append_changelog(msg)
     update_md_files(msg)
