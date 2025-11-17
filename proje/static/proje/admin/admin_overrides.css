@@ -1,0 +1,8 @@
+/* Admin overrides to improve form spacing and alignment for AdminLTE */
+.form-group { margin-bottom: 0.75rem; }
+.form-horizontal .form-group.row { align-items: center; }
+.form-control-file { display: block; }
+.card .card-body label.col-form-label { font-weight: 600; }
+
+/* Fix admin inline table inputs to align with form-control */
+.inline-related .form-control { width: 100%; }

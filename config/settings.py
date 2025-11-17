@@ -156,6 +156,11 @@ STATICFILES_DIRS = [BASE_DIR / "static"]
 # Directory where `collectstatic` will copy files for production
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
+# Media files (user uploads)
+# Default to /media/ and <BASE_DIR>/media for development if not provided via env
+MEDIA_URL = os.getenv("DJANGO_MEDIA_URL", "/media/")
+MEDIA_ROOT = Path(os.getenv("DJANGO_MEDIA_ROOT", BASE_DIR / "media"))
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 

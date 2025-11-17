@@ -1,0 +1,12 @@
+/* Small preview styling for document thumbnails in admin */
+.doc-thumb {
+  max-width: 160px;
+  height: auto;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+.doc-thumb-link { display: inline-block; margin: 4px; }
+.doc-thumb-link img { vertical-align: middle; }
+
+/* ensure file links don't overflow */
+.doc-thumb-link { word-break: break-all; }

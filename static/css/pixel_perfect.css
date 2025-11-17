@@ -1,0 +1,61 @@
+/* Central pixel-perfect overrides for Syncra CRM demo
+   - Consistent spacing, font sizes and small-box tweaks
+   - Use this file to apply final visual alignment fixes across pages
+*/
+:root{
+  --syncra-heading-margin: 0.35rem;
+  --syncra-card-radius: .35rem;
+}
+
+/* Base content spacing */
+.container-fluid, .container {
+  padding-left: 1.25rem;
+  padding-right: 1.25rem;
+}
+
+h1, h2, h3, h4, h5 {
+  margin-top: 0.25rem;
+  margin-bottom: 0.6rem;
+  font-weight: 600;
+}
+
+p { margin-bottom: 0.6rem; }
+
+/* Small box tweaks (AdminLTE examples used on dashboard) */
+.small-box {
+  border-radius: var(--syncra-card-radius);
+  padding: 1rem 1rem 0.85rem 1rem;
+  overflow: hidden;
+}
+.small-box .inner h3 { font-size: 1.5rem; line-height: 1.05; margin: 0 0 0.2rem 0; }
+.small-box .inner p { font-size: 0.95rem; margin: 0; color: rgba(255,255,255,.95); }
+.small-box .icon { top: 8px; right: 10px; font-size: 2.25rem; opacity: 0.95; }
+.small-box .small-box-footer { padding: 0.5rem 0; display: block; color: rgba(255,255,255,0.95); }
+
+/* Make shadows subtle and consistent */
+.shadow-sm { box-shadow: 0 1px 6px rgba(0,0,0,0.06) !important; }
+.card, .small-box, .info-box { border: 0; }
+
+/* Form controls alignment for demo pages */
+.form-control { height: calc(1.6em + .75rem + 2px); padding: .375rem .75rem; }
+.form-group { margin-bottom: .8rem; }
+
+/* Table and card spacing */
+.table th, .table td { vertical-align: middle; }
+.card .card-body { padding: 1rem; }
+
+/* Responsive tweaks: ensure consistent gap between cards */
+.row.gap-fix { margin-left: -0.5rem; margin-right: -0.5rem; }
+.row.gap-fix > [class*='col-'] { padding-left: 0.5rem; padding-right: 0.5rem; }
+
+/* Utility: centering icon blocks used in some demo widgets */
+.widget-center { display:flex; align-items:center; justify-content:center; }
+
+/* Ensure images used in cards don't overflow their card */
+.card img, .small-box img { max-width: 100%; height: auto; }
+
+/* AdminLTE specific small fixes */
+.content-wrapper { background-color: #f7f9fb; }
+
+/* Mobile friendliness: touch targets */
+.btn, .small-box .small-box-footer { min-height: 36px; }

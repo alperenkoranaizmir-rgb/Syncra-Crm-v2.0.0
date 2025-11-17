@@ -1,26 +1,52 @@
-{% extends "admin/base_site.html" %}
+{% extends "admin/change_form.html" %}
 {% load i18n %}
 
 {% block content %}
-  <h1>{{ title }}</h1>
-    <form method="post" enctype="multipart/form-data" novalidate>
+  <h1 class="mb-3">{{ title }}</h1>
+  <form method="post" enctype="multipart/form-data" novalidate class="form-horizontal">
     {% csrf_token %}
-    <table>
-      {{ form.project.errors }}
-      <tr><th>{{ form.project.label_tag }}</th><td>{{ form.project }}</td></tr>
-      {{ form.unit.errors }}
-      <tr><th>{{ form.unit.label_tag }}</th><td>{{ form.unit }}</td></tr>
-      {{ form.uploaded_by.errors }}
-      <tr><th>{{ form.uploaded_by.label_tag }}</th><td>{{ form.uploaded_by }}</td></tr>
-      <tr>
-        <th><label for="id_files">Dosyalar</label></th>
-        <td><input type="file" name="files" id="id_files" multiple></td>
-      </tr>
-      {{ form.labels.errors }}
-      <tr><th>{{ form.labels.label_tag }}</th><td>{{ form.labels }}</td></tr>
-    </table>
-    <div class="submit-row">
-      <input type="submit" value="Kaydet" class="default" />
+    <div class="row">
+      <div class="col-md-8">
+        <div class="card">
+          <div class="card-body">
+            {% if form.non_field_errors %}
+              <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+            {% endif %}
+
+            <div class="form-group row">
+              <label class="col-sm-3 col-form-label">{{ form.project.label }}</label>
+              <div class="col-sm-9">{{ form.project }}{% if form.project.errors %}<div class="text-danger">{{ form.project.errors }}</div>{% endif %}</div>
+            </div>
+
+            <div class="form-group row">
+              <label class="col-sm-3 col-form-label">{{ form.unit.label }}</label>
+              <div class="col-sm-9">{{ form.unit }}{% if form.unit.errors %}<div class="text-danger">{{ form.unit.errors }}</div>{% endif %}</div>
+            </div>
+
+            <div class="form-group row">
+              <label class="col-sm-3 col-form-label">{{ form.uploaded_by.label }}</label>
+              <div class="col-sm-9">{{ form.uploaded_by }}{% if form.uploaded_by.errors %}<div class="text-danger">{{ form.uploaded_by.errors }}</div>{% endif %}</div>
+            </div>
+
+            <div class="form-group row">
+              <label class="col-sm-3 col-form-label" for="id_files">Dosyalar</label>
+              <div class="col-sm-9"><input type="file" name="files" id="id_files" multiple class="form-control-file"></div>
+            </div>
+
+            <div class="form-group row">
+              <label class="col-sm-3 col-form-label">{{ form.labels.label }}</label>
+              <div class="col-sm-9">{{ form.labels }}{% if form.labels.errors %}<div class="text-danger">{{ form.labels.errors }}</div>{% endif %}</div>
+            </div>
+
+            <div class="form-group row mt-3">
+              <div class="col-sm-9 offset-sm-3">
+                <button class="btn btn-primary" type="submit">Kaydet</button>
+                <a class="btn btn-secondary" href="{% url 'admin:proje_document_changelist' %}">İptal</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </form>
 {% endblock %}

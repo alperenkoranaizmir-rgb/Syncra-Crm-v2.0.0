@@ -12,18 +12,19 @@ from django.utils.html import format_html
 
 from proje.models import Agreement, Document, Owner, Ownership, Project, Unit
 
+from .admin_helpers import AdminBootstrapMixin
 from .utils import generate_report_path
 
 
 @admin.register(Project)
-class ProjectAdmin(admin.ModelAdmin):
+class ProjectAdmin(AdminBootstrapMixin, admin.ModelAdmin):
     list_display = ("code", "name", "status", "manager")
     search_fields = ("code", "name", "location")
     list_filter = ("status", "type")
 
 
 @admin.register(Owner)
-class OwnerAdmin(admin.ModelAdmin):
+class OwnerAdmin(AdminBootstrapMixin, admin.ModelAdmin):
     list_display = ("first_name", "last_name", "tc_no", "phone")
     search_fields = ("first_name", "last_name", "tc_no")
     actions = ["assign_group_to_owner_users"]
@@ -36,6 +37,14 @@ class OwnerAdmin(admin.ModelAdmin):
         upload_s3 = forms.BooleanField(required=False, initial=False)
         s3_bucket = forms.CharField(required=False)
         s3_public = forms.BooleanField(required=False, initial=False)
+
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            # add consistent classes to widgets
+            for name, field in self.fields.items():
+                widget = field.widget
+                css = widget.attrs.get("class", "")
+                widget.attrs["class"] = (css + " form-control").strip()
 
     action_form = GroupAssignActionForm
 
@@ -192,13 +201,13 @@ class OwnerAdmin(admin.ModelAdmin):
 
 
 @admin.register(Unit)
-class UnitAdmin(admin.ModelAdmin):
+class UnitAdmin(AdminBootstrapMixin, admin.ModelAdmin):
     list_display = ("project", "ada", "parsel", "type", "agreement_status")
     list_filter = ("type", "agreement_status")
     search_fields = ("ada", "parsel", "address")
 
 
-class DocumentInline(admin.TabularInline):
+class DocumentInline(AdminBootstrapMixin, admin.TabularInline):
     model = Document
     extra = 0
     # allow editing the file directly in the inline and show a change link
@@ -211,20 +220,38 @@ class DocumentInline(admin.TabularInline):
             return "-"
         url = getattr(obj.file, "url", None)
         name = obj.label or obj.file.name.split("/")[-1]
-        # Render a clickable thumbnail link when possible
+        # try to get file size and uploaded_by for metadata
+        size = None
+        uploader = None
+        try:
+            size = obj.file.size
+        except Exception:
+            size = None
+        try:
+            if getattr(obj.uploaded_by, "get_full_name", None):
+                uploader = obj.uploaded_by.get_full_name()
+            else:
+                uploader = getattr(obj.uploaded_by, "username", None)
+        except Exception:
+            uploader = None
+        # Render a clickable thumbnail link when possible, including metadata attrs
         if url:
-            return format_html(
-                '<a href="{}" class="doc-thumb-link" data-full="{}" target="_blank">{}</a>',
-                url,
-                url,
-                name,
+            tpl = (
+                '<a href="{}" class="doc-thumb-link" data-full="{}" '
+                'data-size="{}" data-uploader="{}" target="_blank">{}</a>'
             )
+            return format_html(tpl, url, url, size or "", uploader or "", name)
         return name
 
-    file_link.short_description = "Dosya"
+    file_link.short_description = "Dosya"  # type: ignore[attr-defined]
 
     class Media:
-        css = {"all": ("proje/admin/document_preview.css",)}
+        css = {
+            "all": (
+                "proje/admin/document_preview.css",
+                "proje/admin/admin_overrides.css",
+            )
+        }
         js = ("proje/admin/document_preview.js",)
 
 
@@ -233,32 +260,64 @@ UnitAdmin.inlines = [DocumentInline]
 
 
 @admin.register(Ownership)
-class OwnershipAdmin(admin.ModelAdmin):
+class OwnershipAdmin(AdminBootstrapMixin, admin.ModelAdmin):
     list_display = ("unit", "owner", "share_percent", "status")
 
 
 @admin.register(Agreement)
-class AgreementAdmin(admin.ModelAdmin):
+class AgreementAdmin(AdminBootstrapMixin, admin.ModelAdmin):
     list_display = ("unit", "date", "status", "staff")
 
 
 @admin.register(Document)
-class DocumentAdmin(admin.ModelAdmin):
-    list_display = ("label", "file_link", "project", "unit", "uploaded_by", "uploaded_at")
+class DocumentAdmin(AdminBootstrapMixin, admin.ModelAdmin):
+    list_display = (
+        "label",
+        "file_link",
+        "project",
+        "unit",
+        "uploaded_by",
+        "uploaded_at",
+    )
     readonly_fields = ("uploaded_at", "preview")
     search_fields = ("label", "file__icontains")
-    fields = ("label", "preview", "file", "project", "unit", "uploaded_by", "uploaded_at")
+    fields = (
+        "label",
+        "preview",
+        "file",
+        "project",
+        "unit",
+        "uploaded_by",
+        "uploaded_at",
+    )
 
     def file_link(self, obj):
         if not obj or not obj.file:
             return "-"
         url = getattr(obj.file, "url", None)
         name = obj.label or obj.file.name.split("/")[-1]
+        size = None
+        uploader = None
+        try:
+            size = obj.file.size
+        except Exception:
+            size = None
+        try:
+            if getattr(obj.uploaded_by, "get_full_name", None):
+                uploader = obj.uploaded_by.get_full_name()
+            else:
+                uploader = getattr(obj.uploaded_by, "username", None)
+        except Exception:
+            uploader = None
         if url:
-            return format_html('<a href="{}" target="_blank">{}</a>', url, name)
+            tpl = (
+                '<a href="{}" class="doc-thumb-link" data-full="{}" '
+                'data-size="{}" data-uploader="{}" target="_blank">{}</a>'
+            )
+            return format_html(tpl, url, url, size or "", uploader or "", name)
         return name
 
-    file_link.short_description = "Dosya"
+    file_link.short_description = "Dosya"  # type: ignore[attr-defined]
 
     def preview(self, obj):
         """Show an image thumbnail for image files, or a file icon/name otherwise."""
@@ -266,22 +325,43 @@ class DocumentAdmin(admin.ModelAdmin):
             return "-"
         url = getattr(obj.file, "url", None)
         # crude image detection by extension
-        if url and str(obj.file.name).lower().endswith((".png", ".jpg", ".jpeg", ".gif", ".webp")):
-            # return a thumbnail image with class for CSS sizing and a link that opens lightbox
-            return format_html(
-                '<a href="{0}" class="doc-thumb-link" data-full="{0}"><img src="{0}" class="doc-thumb"/></a>',
-                url,
-            )
+        if url:
+            fname = str(obj.file.name).lower()
+            if fname.endswith((".png", ".jpg", ".jpeg", ".gif", ".webp")):
+                # Include metadata attrs and return a thumbnail link (opens lightbox)
+                size = None
+                uploader = None
+                try:
+                    size = obj.file.size
+                except Exception:
+                    size = None
+                try:
+                    if getattr(obj.uploaded_by, "get_full_name", None):
+                        uploader = obj.uploaded_by.get_full_name()
+                    else:
+                        uploader = getattr(obj.uploaded_by, "username", None)
+                except Exception:
+                    uploader = None
+                tpl = (
+                    '<a href="{}" class="doc-thumb-link" data-full="{}" '
+                    'data-size="{}" data-uploader="{}"><img src="{}" class="doc-thumb"/></a>'
+                )
+                return format_html(tpl, url, url, size or "", uploader or "", url)
         # not an image -- show clickable name
         name = obj.label or obj.file.name.split("/")[-1]
         if url:
             return format_html('<a href="{}" target="_blank">{}</a>', url, name)
         return name
 
-    preview.short_description = "Önizleme"
+    preview.short_description = "Önizleme"  # type: ignore[attr-defined]
 
     class Media:
-        css = {"all": ("proje/admin/document_preview.css",)}
+        css = {
+            "all": (
+                "proje/admin/document_preview.css",
+                "proje/admin/admin_overrides.css",
+            )
+        }
         js = ("proje/admin/document_preview.js",)
 
     class DocumentBulkUploadForm(forms.ModelForm):
@@ -295,7 +375,20 @@ class DocumentAdmin(admin.ModelAdmin):
 
         class Meta:
             model = Document
-            fields = ("project", "unit", "uploaded_by",)
+            fields = (
+                "project",
+                "unit",
+                "uploaded_by",
+            )
+
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            # Add Bootstrap / AdminLTE classes to widgets for consistent styling
+            for name, field in self.fields.items():
+                widget = field.widget
+                css = widget.attrs.get("class", "")
+                classes = (css + " form-control").strip()
+                widget.attrs["class"] = classes
 
     def add_view(self, request, form_url="", extra_context=None):
         """Custom add view to support multiple file uploads with optional labels."""
@@ -304,12 +397,10 @@ class DocumentAdmin(admin.ModelAdmin):
             if form.is_valid():
                 files = request.FILES.getlist("files")
                 labels_raw = form.cleaned_data.get("labels") or ""
-                labels = [l.strip() for l in labels_raw.splitlines() if l.strip()]
+                labels = [ln.strip() for ln in labels_raw.splitlines() if ln.strip()]
                 project = form.cleaned_data.get("project")
                 unit = form.cleaned_data.get("unit")
-                uploaded_by = (
-                    form.cleaned_data.get("uploaded_by") or request.user
-                )
+                uploaded_by = form.cleaned_data.get("uploaded_by") or request.user
 
                 created = []
                 for idx, f in enumerate(files):
