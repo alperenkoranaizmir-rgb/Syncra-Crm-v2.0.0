@@ -1,3 +1,9 @@
+"""Tests for the Document admin preview helper.
+
+Verifies that image documents render an inline preview and that
+non-image documents render a link target.
+"""
+
 import tempfile
 
 from django.contrib import admin
@@ -11,6 +17,7 @@ User = get_user_model()
 
 
 class DocumentAdminPreviewTests(TestCase):
+    """Ensure admin preview renders image previews and links for others."""
     def test_preview_includes_metadata_for_images_and_links_for_non_images(self):
         tmpdir = tempfile.mkdtemp()
         with override_settings(MEDIA_ROOT=tmpdir, MEDIA_URL="/media/"):
