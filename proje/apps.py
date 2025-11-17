@@ -1,7 +1,20 @@
+"""App configuration for the `proje` application.
+
+This module defines `ProjeConfig` AppConfig used to register application
+startup hooks, for example creating default auth groups when the app is
+initialized in a running Django environment.
+"""
+
 from django.apps import AppConfig
 
 
 class ProjeConfig(AppConfig):
+    """Django AppConfig for the `proje` application.
+
+    Responsible for app metadata and performing lightweight startup hooks
+    such as ensuring required auth groups exist when the application is
+    initialized in a running Django environment.
+    """
     default_auto_field = "django.db.models.BigAutoField"
     name = "proje"
     verbose_name = "Proje Yönetimi"

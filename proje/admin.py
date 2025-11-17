@@ -5,21 +5,30 @@ This module centralizes admin UI tweaks (inlines, bulk upload, custom actions)
 and includes styling hooks for AdminLTE/Bootstrap integration.
 """
 
-from pathlib import Path
-
 from django import forms
 from django.conf import settings
 from django.contrib import admin
 from django.contrib import messages
-from django.contrib.auth import get_user_model
+
 from django.contrib.auth.models import Group
 from django.shortcuts import render
 from django.utils.html import format_html
+from django.shortcuts import redirect
+from django.template.response import TemplateResponse
 
 from proje.models import Agreement, Document, Owner, Ownership, Project, Unit
 
-from .admin_helpers import AdminBootstrapMixin
-from .utils import generate_report_path
+from .admin_helpers import (
+    AdminBootstrapMixin,
+    build_owner_assign_report,
+    prepare_owner_report,
+    parse_owner_assign_post,
+    build_owner_assign_context,
+)
+from .admin_helpers import (
+    create_documents_from_files,
+    build_document_return_url,
+)
 
 
 @admin.register(Project)
@@ -39,7 +48,15 @@ class OwnerAdmin(AdminBootstrapMixin, admin.ModelAdmin):
 
     # Provide an action form to pick a group
     class GroupAssignActionForm(forms.Form):
-        group = forms.ModelChoiceField(queryset=Group.objects.all(), required=True)
+        """Action form used by the OwnerAdmin.assign_group_to_owner_users action.
+
+        Allows picking a group, toggling S3 upload and providing an optional
+        report file path.
+        """
+        group = forms.ModelChoiceField(
+            queryset=Group.objects.all(),
+            required=True,
+        )
         # Admin expects an 'action' field to exist; provide an empty ChoiceField
         action = forms.ChoiceField(choices=(), required=False)
         upload_s3 = forms.BooleanField(required=False, initial=False)
@@ -64,113 +81,56 @@ class OwnerAdmin(AdminBootstrapMixin, admin.ModelAdmin):
         """
         # If this is the confirmation POST, perform assignment
         if request.method == "POST" and request.POST.get("confirm"):
-            group_pk = request.POST.get("group")
-            dry_run = request.POST.get("dry_run") == "on"
-            report_file = request.POST.get("report_file") or ""
-            report_format = request.POST.get("report_format") or "csv"
-            upload_s3 = request.POST.get("upload_s3") == "on"
-            s3_bucket = request.POST.get("s3_bucket") or None
-            s3_public = request.POST.get("s3_public") == "on"
+            # Parse POST once using helper to reduce inline locals and branching
+            params = parse_owner_assign_post(request.POST)
 
-            group = Group.objects.filter(pk=group_pk).first()
+            group = Group.objects.filter(pk=params["group_pk"]).first()
             if not group:
-                self.message_user(
-                    request, "No group selected", level=messages.ERROR
-                )
+                self.message_user(request, "No group selected", level=messages.ERROR)
                 return None
 
-            User = get_user_model()
-            report_rows = []
-            assigned = 0
-            for owner in queryset:
-                ident = (owner.email or "").strip()
-                if not ident:
-                    report_rows.append({"ident": str(owner), "status": "no_email"})
-                    continue
-                user = User.objects.filter(email__iexact=ident).first()
-                if not user:
-                    report_rows.append({"ident": ident, "status": "not_found"})
-                    continue
-                if dry_run:
-                    report_rows.append(
-                        {
-                            "ident": ident,
-                            "user": str(user),
-                            "group": str(group),
-                            "status": "would_assign",
-                        }
-                    )
-                else:
-                    group.user_set.add(user)
-                    assigned += 1
-                    report_rows.append(
-                        {
-                            "ident": ident,
-                            "user": str(user),
-                            "group": str(group),
-                            "status": "assigned",
-                        }
-                    )
-
-            # if no report_file provided but we have report_rows, generate auto-named path
-            if not report_file and report_rows:
-                report_file = generate_report_path(
-                    prefix="reports/owners_assign", ext=report_format
-                )
-
-            # If admin didn't provide a path, auto-generate one using admin username
-            if not report_file and report_rows:
-                report_file = generate_report_path(
-                    prefix="reports/owners_assign",
-                    ext=report_format,
-                    label=getattr(request.user, "username", None),
-                )
-
-            # write report if requested and optionally upload; delegate to helpers
-            report_s3_url = None
-            report_file_url = None
-            target_path = None
-            if report_file:
-                from .admin_helpers import (
-                    save_report_rows,
-                    upload_report_to_s3,
-                )
-
-                target_path = save_report_rows(report_rows, report_file, report_format)
-
-                if upload_s3:
-                    bucket = s3_bucket or getattr(settings, "REPORTS_S3_BUCKET", None)
-                    report_s3_url = upload_report_to_s3(target_path, bucket=bucket, public=s3_public)
-
-                media_root = getattr(settings, "MEDIA_ROOT", None)
-                if target_path and media_root:
-                    try:
-                        relpath = Path(target_path).relative_to(media_root)
-                        # Use admin-facing download view
-                        from django.urls import reverse
-
-                        report_file_url = reverse("proje:report_download", args=[str(relpath)])
-                    except Exception:  # pylint: disable=broad-except
-                        report_file_url = None
-
-            self.message_user(
-                request,
-                f"Assigned {assigned} users to group '{group}' (dry-run={dry_run})",
+            report_rows, assigned = build_owner_assign_report(
+                queryset,
+                group,
+                dry_run=params["dry_run"],
             )
 
-            # Render a result page with report rows and optional download link
+            # prepare, write and optionally upload the report; helper centralizes path
+            _target_path, report_file, report_file_url, report_s3_url = prepare_owner_report(
+                report_rows,
+                params["report_file"],
+                params["report_format"],
+                request.user,
+                upload_options={
+                    "upload_s3": params["upload_s3"],
+                    "s3_bucket": params["s3_bucket"],
+                    "s3_public": params["s3_public"],
+                },
+            )
+
+            msg = (
+                f"Assigned {assigned} users to group '{group}' "
+                f"(dry-run={params['dry_run']})"
+            )
+            self.message_user(request, msg)
+
+            # Build render context using helper
             media_url = getattr(settings, "MEDIA_URL", "")
-            context = {
-                "opts": self.model._meta,  # pylint: disable=protected-access
+            report_info = {
                 "report_rows": report_rows,
                 "report_file": report_file,
                 "report_file_url": report_file_url,
                 "report_s3_url": report_s3_url,
-                "report_format": report_format,
-                "group": group,
-                "dry_run": dry_run,
-                "media_url": media_url,
+                "report_format": params["report_format"],
             }
+
+            context = build_owner_assign_context(
+                self.model._meta,  # pylint: disable=protected-access
+                report_info,
+                group,
+                params["dry_run"],
+                media_url,
+            )
             return render(request, "admin/proje/owner_assign_result.html", context)
 
         # Otherwise render confirmation page
@@ -185,20 +145,26 @@ class OwnerAdmin(AdminBootstrapMixin, admin.ModelAdmin):
 
 @admin.register(Unit)
 class UnitAdmin(AdminBootstrapMixin, admin.ModelAdmin):
+    """Admin for `Unit` model: list, filters and search configuration."""
     list_display = ("project", "ada", "parsel", "type", "agreement_status")
     list_filter = ("type", "agreement_status")
     search_fields = ("ada", "parsel", "address")
 
 
 class DocumentInline(AdminBootstrapMixin, admin.TabularInline):
-    model = Document
+    """Inline admin for `Document` entries attached to a `Unit`.
+
+    Shows a small file thumbnail/link and basic metadata in the inline table.
+    """
     extra = 0
+    model = Document
     # allow editing the file directly in the inline and show a change link
     fields = ("file", "label", "file_link", "uploaded_by", "uploaded_at")
     readonly_fields = ("file_link", "uploaded_by", "uploaded_at")
     show_change_link = True
 
     def file_link(self, obj):
+        """Return an HTML link or filename for the inline document preview."""
         if not obj or not obj.file:
             return "-"
         url = getattr(obj.file, "url", None)
@@ -278,6 +244,7 @@ class DocumentAdmin(AdminBootstrapMixin, admin.ModelAdmin):
     )
 
     def file_link(self, obj):
+        """Return an HTML link or filename for the document preview in list view."""
         if not obj or not obj.file:
             return "-"
         url = getattr(obj.file, "url", None)
@@ -351,12 +318,18 @@ class DocumentAdmin(AdminBootstrapMixin, admin.ModelAdmin):
         js = ("proje/admin/document_preview.js",)
 
     class DocumentBulkUploadForm(forms.ModelForm):
-        # We handle the files upload via request.FILES.getlist('files') in add_view,
-        # to avoid widget limitations. Labels are provided as textarea lines.
+        """Form used by `DocumentAdmin.add_view` to accept multiple files.
+
+        We handle the file list via `request.FILES.getlist('files')` in
+        `add_view`; labels are provided as newline-separated textarea input.
+        """
         labels = forms.CharField(
             widget=forms.Textarea,
             required=False,
-            help_text="Her satıra bir etiket girin; dosyalarla sırayla eşlenecektir (örnek: sözleşme).",
+            help_text=(
+                "Her satıra bir etiket girin; dosyalarla sırayla eşlenecektir "
+                "(örnek: sözleşme)."
+            ),
         )
 
         class Meta:
@@ -388,28 +361,11 @@ class DocumentAdmin(AdminBootstrapMixin, admin.ModelAdmin):
                 unit = form.cleaned_data.get("unit")
                 uploaded_by = form.cleaned_data.get("uploaded_by") or request.user
 
-                created = []
-                for idx, f in enumerate(files):
-                    label = labels[idx] if idx < len(labels) else ""
-                    doc = Document.objects.create(
-                        project=project,
-                        unit=unit,
-                        file=f,
-                        label=label,
-                        uploaded_by=uploaded_by,
-                    )
-                    created.append(doc)
+                created = create_documents_from_files(files, labels, project, unit, uploaded_by)
 
-                # After creation redirect to unit change page if unit provided, else to document changelist
-                if unit:
-                    from django.urls import reverse
-
-                    return_url = reverse("admin:proje_unit_change", args=[unit.pk])
-                else:
-                    from django.urls import reverse
-
-                    return_url = reverse("admin:proje_document_changelist")
-                from django.shortcuts import redirect
+                # After creation, redirect to the unit change page if `unit` is
+                # provided; otherwise send admin to the document changelist.
+                return_url = build_document_return_url(unit)
 
                 self.message_user(request, f"Yüklendi: {len(created)} dosya")
                 return redirect(return_url)
@@ -423,6 +379,5 @@ class DocumentAdmin(AdminBootstrapMixin, admin.ModelAdmin):
             form=form,
             opts=self.model._meta,  # pylint: disable=protected-access
         )
-        from django.template.response import TemplateResponse
 
         return TemplateResponse(request, "admin/proje/document_add_bulk.html", context)

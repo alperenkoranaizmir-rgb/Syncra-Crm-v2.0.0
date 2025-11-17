@@ -52,3 +52,21 @@ Hataların çoğu düzeltildi; kalan eylem: statik çakışma politikasını net
 
 ### Son Değişiklikler (2025-11-17):
 - chore(lint): narrow script excepts, add docstrings for scripts, add pylint to CI
+
+### Son Değişiklikler (2025-11-17):
+- chore(docs): add module docstrings and admin QA helper
+
+### Son Değişiklikler (2025-11-17):
+- ci: set DJANGO_SETTINGS_MODULE at job level for tests & lint
+
+### Son Değişiklikler (2025-11-17):
+- scripts: make admin_qa robust to DisallowedHost by setting HTTP_HOST
+
+### Son Değişiklikler (2025-11-17):
+- refactor(admin): extract report write/upload helpers and simplify owner assign action
+
+### Son Değişiklikler (2025-11-17):
+- chore(docs/refactor): add admin class docstrings and remove unused imports
+
+### Son Değişiklikler (2025-11-17):
+- chore(docs): add helper docstrings and utils module docstring; wrap long signature

@@ -36,3 +36,21 @@ Bu dosya proje içi önemli değişiklikleri kronolojik olarak kaydeder. `script
 
 ## 2025-11-17 04:58:11 UTC — chore(lint): narrow script excepts, add docstrings for scripts, add pylint to CI
 
+
+## 2025-11-17 05:04:57 UTC — chore(docs): add module docstrings and admin QA helper
+
+
+## 2025-11-17 05:05:45 UTC — ci: set DJANGO_SETTINGS_MODULE at job level for tests & lint
+
+
+## 2025-11-17 05:08:02 UTC — scripts: make admin_qa robust to DisallowedHost by setting HTTP_HOST
+
+
+## 2025-11-17 05:12:58 UTC — refactor(admin): extract report write/upload helpers and simplify owner assign action
+
+
+## 2025-11-17 05:13:34 UTC — chore(docs/refactor): add admin class docstrings and remove unused imports
+
+
+## 2025-11-17 05:14:12 UTC — chore(docs): add helper docstrings and utils module docstring; wrap long signature
+

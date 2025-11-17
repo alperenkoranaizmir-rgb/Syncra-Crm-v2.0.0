@@ -1,0 +1,373 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    
+        <title>Proje Dosyası Ekle (Çoklu) | Syncra CRM</title>
+    
+
+    
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-COMPATIBLE" content="IE=edge">
+        <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    
+
+    
+        
+
+
+<!-- Font Awesome -->
+<link rel="stylesheet" href="/static/admin-lte/plugins/fontawesome-free/css/all.min.css">
+<!-- Ionicons -->
+<link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+<link rel="stylesheet" type="text/css" href="/static/admin-lte/dist/css/adminlte.min.css">
+<link rel="stylesheet" type="text/css" href="/static/admin-lte/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+<link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+
+
+        
+    
+
+    
+
+
+
+<link rel="stylesheet" type="text/css"
+    href="/static/admin/css/base.css" />
+
+<link rel="stylesheet" type="text/css" href="/static/admin/css/forms.css" />
+
+<script type="text/javascript" src="/admin/jsi18n/"></script>
+
+
+
+<meta name="robots" content="NONE,NOARCHIVE" />
+
+</head>
+<body class="hold-transition sidebar-mini layout-fixed  app-proje model-document change-form">
+
+
+    <div class="wrapper">
+        
+
+
+<nav class="main-header navbar navbar-expand navbar-white navbar-light">
+
+
+    <!-- Header Navbar: style can be found in header.less -->
+    
+    <!-- Left navbar links -->
+    <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link" data-widget="pushmenu" href="#"><i class="fas fa-bars"></i></a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/" class="nav-link">Home</a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/admin" class="nav-link">Admin</a>
+        </li>
+    </ul>
+
+    
+    <!-- SEARCH FORM -->
+    <form class="form-inline ml-3">
+        <div class="input-group input-group-sm">
+            <input class="form-control form-control-navbar" type="search" placeholder="Search" aria-label="Search">
+            <div class="input-group-append">
+                <button class="btn btn-navbar" type="submit">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+    </form>
+    
+
+    
+        <!-- Right navbar links -->
+        <ul class="navbar-nav ml-auto">
+            
+
+            
+            <li class="nav-item dropdown user-menu">
+                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" aria-expanded="true">
+                  <img src="https://www.gravatar.com/avatar/e64c7d89f26bd1972efa854d13d7dd61?s=128&amp;d=mm" class="user-image img-circle elevation-2" alt="User Image">
+                  <span class="d-none d-md-inline">admin</span>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+                  <!-- User image -->
+                  <li class="user-header bg-primary">
+                    <img src="https://www.gravatar.com/avatar/e64c7d89f26bd1972efa854d13d7dd61?s=160&amp;d=mm" class="img-circle elevation-2" alt="User Image">
+        
+                    <p>
+                        admin - 
+                      <small>Member since : 16 Kasım 2025 20:17</small>
+                    </p>
+                  </li>
+                  <!-- Menu Body -->
+                  <li class="user-body">
+                    <div class="row">
+                      <div class="col-4 text-center">
+                        <a href="#">Profile</a>
+                      </div>
+                      <div class="col-4 text-center">
+                        <a href="#">Team</a>
+                      </div>
+                      <div class="col-4 text-center">
+                        <a href="#">Friends</a>
+                      </div>
+                    </div>
+                    <!-- /.row -->
+                  </li>
+                  <!-- Menu Footer-->
+                  <li class="user-footer">
+                    <a href="/admin/password_change/" class="btn btn-default btn-flat">Change Password</a>
+                    <form method="post" action="/admin/logout/" class="float-right">
+                      <input type="hidden" name="csrfmiddlewaretoken" value="xJUAI4cB5eeMiTFprHwkNSVKjiqV5AkytT5nzmJFe5iVnw4WD5snnX8p3oYKJc29">
+                      <button type="submit" class="btn btn-default btn-flat">Sign Out</button>
+                    </form>
+                  </li>
+                </ul>
+              </li>
+            
+            
+
+
+        </ul>
+
+    
+
+
+</nav>
+
+
+        
+
+
+<!-- Left side column. contains the sidebar -->
+<aside class="main-sidebar sidebar-dark-primary  elevation-4">
+     <!-- Brand Logo -->
+    
+        <a href="/" class="brand-link">
+            <img src="/static/admin-lte/dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+            <span class="brand-text font-weight-light">AdminLTE 4 </span>
+        </a>
+    
+    <!-- sidebar: style can be found in sidebar.less -->
+    <div class="sidebar">
+        <!-- Sidebar user panel -->
+        
+        <!-- Sidebar user panel (optional) -->
+      <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+        <div class="image">
+          <img src="https://www.gravatar.com/avatar/e64c7d89f26bd1972efa854d13d7dd61?s=90&amp;d=mm" class="img-circle elevation-2" alt="User Image">
+        </div>
+        <div class="info">
+          <a href="#" class="d-block">admin</a>
+        </div>
+      </div>
+        
+
+        
+
+        <!-- sidebar menu: : style can be found in sidebar.less -->
+        
+        <nav class="mt-2">
+            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+            
+            <li class="nav-header">MAIN NAVIGATION</li>
+
+            
+    <li class="nav-item"><a href="/admin/" class="nav-link"><i class="nav-icon fas fa-tachometer-alt"></i> <p>Home</p></a></li><li class="nav-item has-treeview"><a href="#" class="nav-link"><i class="nav-icon fas fa-edit"></i> <p>Kimlik Doğrulama ve ...</p><p><i class="fas fa-angle-left right"></i></p></a><ul class="nav nav-treeview">
+<li class="nav-item"><a href="/admin/auth/group/" class="nav-link"><i class="far fa-circle nav-icon"></i> Gruplar</a></li><li class="nav-item"><a href="/admin/auth/user/" class="nav-link"><i class="far fa-circle nav-icon"></i> Kullanıcılar</a></li></ul></li>
+<li class="nav-item has-treeview menu-open"><a href="#" class="nav-link active"><i class="nav-icon fas fa-edit"></i> <p>Proje Yönetimi</p><p><i class="fas fa-angle-left right"></i></p></a><ul class="nav nav-treeview">
+<li class="nav-item"><a href="/admin/proje/unit/" class="nav-link"><i class="far fa-circle nav-icon"></i> Bağımsız Bölümler</a></li><li class="nav-item"><a href="/admin/proje/owner/" class="nav-link"><i class="far fa-circle nav-icon"></i> Malikler</a></li><li class="nav-item"><a href="/admin/proje/ownership/" class="nav-link"><i class="far fa-circle nav-icon"></i> Mülk Sahibi Hisseleri</a></li><li class="nav-item"><a href="/admin/proje/document/" class="nav-link"><i class="far fa-circle nav-icon"></i> Proje Dosyaları</a></li><li class="nav-item"><a href="/admin/proje/project/" class="nav-link"><i class="far fa-circle nav-icon"></i> Projeler</a></li><li class="nav-item"><a href="/admin/proje/agreement/" class="nav-link"><i class="far fa-circle nav-icon"></i> Uzlaşmalar</a></li></ul></li>
+
+
+            
+            </ul>
+            </nav>
+        
+    </div>
+    <!-- /.sidebar -->
+</aside>
+
+
+
+        
+        <div class="content-wrapper">
+            
+<section class="content-header">
+    <div class="container-fluid">
+        
+
+<div class="row mb-2">
+    <div class="col-sm-4">
+        <h2>Proje Dosyası Ekle (Çoklu)</h2>
+    </div>
+    <div class="col-sm-8">
+        <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="/admin/"><i class="fas fa-tachometer-alt"></i>
+                    Giriş</a></li>
+            <li class="breadcrumb-item"><a
+                    href="/admin/proje/">Proje Yönetimi</a>
+            </li>
+            <li class="breadcrumb-item">
+                Proje Dosyaları
+            </li>
+
+            <li class="breadcrumb-item active"></li>
+        </ol>
+    </div>
+</div>
+
+    </div>
+</section>
+
+
+
+            
+            <section class="content">
+                
+                    
+
+                
+
+                
+
+    
+  <h1 class="mb-3">Proje Dosyası Ekle (Çoklu)</h1>
+  <form method="post" enctype="multipart/form-data" novalidate class="form-horizontal">
+    <input type="hidden" name="csrfmiddlewaretoken" value="xJUAI4cB5eeMiTFprHwkNSVKjiqV5AkytT5nzmJFe5iVnw4WD5snnX8p3oYKJc29">
+    <div class="row">
+      <div class="col-md-8">
+        <div class="card">
+          <div class="card-body">
+            
+
+            <div class="form-group row">
+              <label class="col-sm-3 col-form-label">Project</label>
+              <div class="col-sm-9"><select name="project" class="form-control" id="id_project">
+  <option value="" selected>---------</option>
+
+  <option value="1">ASD - ASD</option>
+
+  <option value="2">DEMO001 - Demo Proje 1</option>
+
+  <option value="3">DEMO002 - Demo Proje 2</option>
+
+</select></div>
+            </div>
+
+            <div class="form-group row">
+              <label class="col-sm-3 col-form-label">Unit</label>
+              <div class="col-sm-9"><select name="unit" class="form-control" id="id_unit">
+  <option value="" selected>---------</option>
+
+  <option value="1">ASD - 1/122</option>
+
+  <option value="2">DEMO001 - 1/1</option>
+
+</select></div>
+            </div>
+
+            <div class="form-group row">
+              <label class="col-sm-3 col-form-label">Uploaded by</label>
+              <div class="col-sm-9"><select name="uploaded_by" class="form-control" id="id_uploaded_by">
+  <option value="" selected>---------</option>
+
+  <option value="1">admin</option>
+
+  <option value="2">admin_demo</option>
+
+  <option value="3">alice_demo</option>
+
+  <option value="4">bob_demo</option>
+
+</select></div>
+            </div>
+
+            <div class="form-group row">
+              <label class="col-sm-3 col-form-label" for="id_files">Dosyalar</label>
+              <div class="col-sm-9"><input type="file" name="files" id="id_files" multiple class="form-control-file"></div>
+            </div>
+
+            <div class="form-group row">
+              <label class="col-sm-3 col-form-label">Labels</label>
+              <div class="col-sm-9"><textarea name="labels" cols="40" rows="10" class="form-control" aria-describedby="id_labels_helptext" id="id_labels">
+</textarea></div>
+            </div>
+
+            <div class="form-group row mt-3">
+              <div class="col-sm-9 offset-sm-3">
+                <button class="btn btn-primary" type="submit">Kaydet</button>
+                <a class="btn btn-secondary" href="/admin/proje/document/">İptal</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+
+
+
+
+            </section>
+            
+
+        </div>
+        
+        
+        
+            <footer class="main-footer">
+        <div class="float-right d-none d-sm-block">
+        
+            <b>Version</b> 0.1
+        
+    </div>
+
+    
+    
+    <strong>Copyright &copy; 2025.
+        
+    </strong> All rights
+    reserved.
+    
+    
+</footer>
+        
+
+
+
+    </div>
+
+
+
+
+
+
+<script src="/static/admin-lte/plugins/jquery/jquery.min.js"></script>
+<script src="/static/admin-lte/plugins/jquery-ui/jquery-ui.min.js"></script>
+<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+<script>
+    $.widget.bridge('uibutton', $.ui.button);
+</script>
+<script src="/static/admin-lte/plugins/bootstrap/js/bootstrap.bundle.min.js "></script>
+
+
+
+
+<script src="/static/admin-lte/dist/js/adminlte.min.js"></script>
+<script src="/static/admin-lte/dist/js/demo.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

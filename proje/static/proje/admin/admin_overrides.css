@@ -6,3 +6,12 @@
 
 /* Fix admin inline table inputs to align with form-control */
 .inline-related .form-control { width: 100%; }
+
+/* Improve vertical alignment and sizing of form controls in AdminLTE admin forms */
+.form-control, .form-control-file {
+	box-sizing: border-box;
+	min-height: calc(1.5em + 0.75rem + 2px);
+}
+
+/* Small spacing tweak for label/input pairs in the admin change/add pages */
+.change-form .form-group { margin-bottom: 0.65rem; }

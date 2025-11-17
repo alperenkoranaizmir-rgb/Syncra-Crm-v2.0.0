@@ -2,9 +2,13 @@
 """List static files that map to the same destination path and their sources.
 
 Run from project root with the virtualenv activated:
-  . .venv/bin/activate && python scripts/list_static_conflicts.py
+    . .venv/bin/activate && python scripts/list_static_conflicts.py
+
+Note: Imports intentionally occur after setting `DJANGO_SETTINGS_MODULE` so
+the script can be executed directly; disable the related pylint warning.
 """
 # flake8: noqa: E402
+# pylint: disable=wrong-import-position
 import os
 
 # Ensure Django settings module is set before importing Django
@@ -29,6 +33,10 @@ def storage_repr(storage):
 
 
 def main():
+    """Scan static finders and print duplicate destination mappings.
+
+    Resilient to finder errors; prints duplicates grouped by destination path.
+    """
     mapping = defaultdict(list)
     for finder in finders.get_finders():
         try:

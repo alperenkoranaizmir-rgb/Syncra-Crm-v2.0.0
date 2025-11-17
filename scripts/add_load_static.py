@@ -14,7 +14,11 @@ LOAD_TAG = "{% load static %}"
 
 
 def needs_load(text: str) -> bool:
-    # Skip if already has load static
+    """Return True when template text appears to need `{% load static %}`.
+
+    Detects `{% static %}` or `static(` usage and returns True if the
+    `{% load static %}` tag is missing.
+    """
     if re.search(r"\{%\s*load\s+static\s*%\}", text):
         return False
     # If the template contains any 'static(' or '{% static' usages, we should add the tag

@@ -1,3 +1,9 @@
+"""URL patterns for the `proje` application.
+
+Defines public-facing views for project CRUD, owner/unit/agreement creation,
+document upload and report download endpoints.
+"""
+
 from django.urls import path
 
 from proje import views

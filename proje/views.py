@@ -20,6 +20,10 @@ from proje.models import Document, Project, Unit
 
 
 def user_is_project_member(user, project_id):
+    """Return True if `user` is a manager or staff member of the project.
+
+    Superusers bypass the check.
+    """
     if user.is_superuser:
         return True
     try:
@@ -63,6 +67,10 @@ class ProjectDetailView(generic.DetailView):
 
 @login_required
 def owner_create(request, project_pk):
+    """Create an `Owner` for the given `Project`.
+
+    Only project members or superusers may create owners.
+    """
     project = get_object_or_404(Project, pk=project_pk)
     # Only project members (or superuser) can add owners
     if not user_is_project_member(request.user, project.pk):
@@ -83,6 +91,7 @@ def owner_create(request, project_pk):
 
 @login_required
 def unit_create(request, project_pk):
+    """Create a `Unit` within a `Project` (protected to project members)."""
     project = get_object_or_404(Project, pk=project_pk)
     # Only project members (or superuser) can add units
     if not user_is_project_member(request.user, project.pk):
@@ -103,6 +112,10 @@ def unit_create(request, project_pk):
 
 @login_required
 def agreement_create(request, unit_pk):
+    """Create an `Agreement` related to a `Unit`.
+
+    Access is restricted to project members or superusers.
+    """
     unit = get_object_or_404(Unit, pk=unit_pk)
     # Only project members (or superuser) can add agreements
     if not user_is_project_member(request.user, unit.project.pk):
@@ -121,6 +134,10 @@ def agreement_create(request, unit_pk):
 
 @login_required
 def document_upload(request, project_pk=None, unit_pk=None):
+    """Handle upload of `Document` files for a project or unit.
+
+    Validates membership and stores uploaded files, setting `uploaded_by`.
+    """
     # Check membership based on project or unit
     if project_pk:
         if not user_is_project_member(request.user, project_pk):

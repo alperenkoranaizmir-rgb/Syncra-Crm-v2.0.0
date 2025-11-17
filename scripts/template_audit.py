@@ -18,6 +18,11 @@ TEMPLATES = ROOT / "templates"
 
 
 def audit_file(p: Path):
+    """Return a list of detected issues for template file `p`.
+
+    Checks for missing `{% load static %}`, missing content block, CDN links
+    and legacy vendor/bootstrap-icons usage.
+    """
     txt = p.read_text(encoding="utf-8")
     issues = []
     if "{% static" in txt and "{% load static %}" not in txt:
@@ -36,6 +41,7 @@ def audit_file(p: Path):
 
 
 def main():
+    """Run an audit over templates and print a summary report to stdout."""
     report = {}
     files = list(TEMPLATES.rglob("*.html"))
     for p in files:

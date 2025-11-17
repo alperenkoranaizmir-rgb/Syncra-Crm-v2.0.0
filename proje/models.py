@@ -9,6 +9,10 @@ from django.db import models
 
 
 class Project(models.Model):
+    """A real-estate development project record.
+
+    Contains metadata such as location, status, manager and budget fields.
+    """
     TYPE_CHOICES = [
         ("kentsel", "Kentsel Dönüşüm"),
         ("altyapi", "Altyapı"),
@@ -64,6 +68,7 @@ class Project(models.Model):
 
 
 class Owner(models.Model):
+    """Represents a property owner (malik) with contact and identity fields."""
     EMPLOYMENT = [
         ("calismiyor", "Çalışmıyor"),
         ("okuyor", "Okuyor"),
@@ -107,6 +112,7 @@ class Owner(models.Model):
 
 
 class Unit(models.Model):
+    """A single unit/parcel within a `Project` (e.g., apartment, shop, land)."""
     TYPE = [
         ("daire", "Daire"),
         ("bina", "Bina"),
@@ -166,6 +172,7 @@ class Unit(models.Model):
 
 
 class Ownership(models.Model):
+    """Through-model associating `Owner` and `Unit` with share percentage."""
     unit = models.ForeignKey(Unit, on_delete=models.CASCADE)
     owner = models.ForeignKey(Owner, on_delete=models.CASCADE)
     share_percent = models.DecimalField(max_digits=6, decimal_places=2, default=100)
@@ -179,6 +186,7 @@ class Ownership(models.Model):
 
 
 class Agreement(models.Model):
+    """Records negotiation/settlement agreements for a `Unit` involving owners."""
     unit = models.ForeignKey(Unit, on_delete=models.CASCADE, related_name="agreements")
     date = models.DateField(null=True, blank=True)
     staff = models.ForeignKey(
@@ -196,6 +204,7 @@ class Agreement(models.Model):
 
 
 class Document(models.Model):
+    """Uploaded documents associated with projects or units (files, scans)."""
     project = models.ForeignKey(
         Project,
         on_delete=models.CASCADE,

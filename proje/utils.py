@@ -4,8 +4,10 @@ Small helpers for generating report paths and uploading files to S3.
 """
 
 import re
+import os
 from datetime import datetime
 from typing import Optional
+import boto3
 
 
 def upload_file_to_s3(
@@ -17,15 +19,13 @@ def upload_file_to_s3(
 ):
     """Upload a local file to S3 and return a dict with keys: bucket, key, url.
 
-    - `bucket`: S3 bucket name. If None, caller must provide via settings or boto3 default.
-    - `key`: object key in S3. If None, the filename will be used.
-    - `public`: if True, the object will be uploaded with public-read ACL and returned URL is the public URL.
-      Otherwise a presigned URL is returned (valid for `expire_seconds`).
+    `bucket` is the S3 bucket name. If `None`, the caller is expected to
+    provide it via settings or allow boto3 to use a default. The `key` is
+    the object key in S3; when omitted the filename is used. When
+    `public` is True the uploaded object will be public-read and the
+    returned `url` is a public URL; otherwise a presigned URL is returned
+    valid for `expire_seconds` seconds.
     """
-    import os
-
-    import boto3
-
     s3 = boto3.client("s3")
     bucket_name = bucket
     if not bucket_name:

@@ -27,12 +27,17 @@ try:
 
     import django
     django.setup()
-except Exception as exc:  # pragma: no cover - environment dependent
+except (
+    ImportError,
+    ModuleNotFoundError,
+    RuntimeError,
+) as exc:  # pragma: no cover - environment dependent
+    # Narrow to common import/configuration errors when setting up Django
     print("Django not available or failed to setup:", exc, file=sys.stderr)
     sys.exit(2)
 
-from django.contrib.auth import get_user_model
-from django.test.client import Client
+from django.contrib.auth import get_user_model  # pylint: disable=wrong-import-position,invalid-name
+from django.test.client import Client  # pylint: disable=wrong-import-position
 
 OUT_FILE = os.path.join(os.path.dirname(__file__), "admin_add_snapshot.html")
 
@@ -43,7 +48,10 @@ def ensure_superuser(username="admin", email="admin@example.com", password="admi
     Returns the (username, password) tuple used to login.
     """
     User = get_user_model()
-    user, created = User.objects.get_or_create(username=username, defaults={"email": email, "is_superuser": True, "is_staff": True})
+    user, created = User.objects.get_or_create(
+        username=username,
+        defaults={"email": email, "is_superuser": True, "is_staff": True},
+    )
     if not created:
         user.email = email
         user.is_superuser = True
@@ -57,6 +65,10 @@ def ensure_superuser(username="admin", email="admin@example.com", password="admi
 
 
 def fetch_admin_add_snapshot(url_path="/admin/proje/document/add/"):
+    """Create (if needed) a superuser, login and fetch admin add page snapshot.
+
+    Returns True on success and writes snapshot to `scripts/admin_add_snapshot.html`.
+    """
     username, password = ensure_superuser()
     client = Client()
     logged_in = client.login(username=username, password=password)
