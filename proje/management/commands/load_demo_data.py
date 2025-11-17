@@ -1,3 +1,13 @@
+"""Management command to populate demo data for local development.
+
+This command creates demo users, groups, projects, owners, units and a
+sample document for quick local testing.
+
+Pylint: disable `django-not-configured` because this file is a Django
+management command and executed with project settings active.
+"""
+
+# pylint: disable=django-not-configured
 from pathlib import Path
 
 from django.conf import settings
@@ -10,6 +20,7 @@ from proje.models import Document, Owner, Ownership, Project, Unit
 
 
 class Command(BaseCommand):
+    """Load demo data: users, groups, projects, owners, units and sample documents."""
     help = "Load demo data: users, groups, projects, owners, units and sample documents"
 
     def add_arguments(self, parser):
@@ -20,7 +31,7 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        User = get_user_model()
+        user_model = get_user_model()
         clear = options.get("clear")
 
         self.stdout.write("Loading demo data...")
@@ -34,7 +45,7 @@ class Command(BaseCommand):
             Group.objects.get_or_create(name=g)
 
         # create users
-        admin, _ = User.objects.get_or_create(
+        admin, _ = user_model.objects.get_or_create(
             username="admin_demo",
             defaults={
                 "email": "admin@example.com",
@@ -42,10 +53,10 @@ class Command(BaseCommand):
                 "is_superuser": True,
             },
         )
-        alice, _ = User.objects.get_or_create(
+        alice, _ = user_model.objects.get_or_create(
             username="alice_demo", defaults={"email": "alice@example.com"}
         )
-        bob, _ = User.objects.get_or_create(
+        bob, _ = user_model.objects.get_or_create(
             username="bob_demo", defaults={"email": "bob@example.com"}
         )
 
@@ -111,8 +122,8 @@ class Command(BaseCommand):
 
     def _clear_demo(self):
         # remove demo-created objects
-        User = get_user_model()
-        User.objects.filter(username__endswith="_demo").delete()
+        user_model = get_user_model()
+        user_model.objects.filter(username__endswith("_demo")).delete()
         Project.objects.filter(code__startswith="DEMO").delete()
         Document.objects.filter(label__in=("demo_readme",)).delete()
         Owner.objects.filter(email__endswith="@example.com").delete()
