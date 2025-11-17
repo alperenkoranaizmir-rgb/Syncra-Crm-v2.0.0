@@ -126,57 +126,32 @@ class OwnerAdmin(AdminBootstrapMixin, admin.ModelAdmin):
                     label=getattr(request.user, "username", None),
                 )
 
-            # write report if requested
-            if report_file:
-                # If report_file is absolute, write there; otherwise write under MEDIA_ROOT
-                target_path = Path(report_file)
-                if not target_path.is_absolute():
-                    media_root = getattr(settings, "MEDIA_ROOT", None)
-                    if media_root:
-                        target_path = Path(media_root) / report_file
-                    else:
-                        target_path = Path(report_file)
-
-                target_path.parent.mkdir(parents=True, exist_ok=True)
-                if report_format == "csv":
-                    keys = ["ident", "user", "group", "status"]
-                    with target_path.open("w", newline="", encoding="utf-8") as outfh:
-                        writer = csv.DictWriter(outfh, fieldnames=keys)
-                        writer.writeheader()
-                        for r in report_rows:
-                            writer.writerow({k: r.get(k, "") for k in keys})
-                else:
-                    with target_path.open("w", encoding="utf-8") as outfh:
-                        json.dump(report_rows, outfh, ensure_ascii=False, indent=2)
-
-            # Optionally upload to S3
+            # write report if requested and optionally upload; delegate to helpers
             report_s3_url = None
-            if report_file and upload_s3:
-                try:
-                    from .utils import upload_file_to_s3
-
-                    bucket = s3_bucket or getattr(settings, "REPORTS_S3_BUCKET", None)
-                    res = upload_file_to_s3(
-                        target_path, bucket=bucket, public=s3_public
-                    )
-                    report_s3_url = res.get("url")
-                except Exception:  # pylint: disable=broad-except
-                    report_s3_url = None
-
-            # prepare download URL if file is under MEDIA_ROOT
             report_file_url = None
-            media_root = getattr(settings, "MEDIA_ROOT", None)
-            if report_file and media_root:
-                try:
-                    relpath = Path(target_path).relative_to(media_root)
-                    # Use admin-facing download view
-                    from django.urls import reverse
+            target_path = None
+            if report_file:
+                from .admin_helpers import (
+                    save_report_rows,
+                    upload_report_to_s3,
+                )
 
-                    report_file_url = reverse(
-                        "proje:report_download", args=[str(relpath)]
-                    )
-                except Exception:  # pylint: disable=broad-except
-                    report_file_url = None
+                target_path = save_report_rows(report_rows, report_file, report_format)
+
+                if upload_s3:
+                    bucket = s3_bucket or getattr(settings, "REPORTS_S3_BUCKET", None)
+                    report_s3_url = upload_report_to_s3(target_path, bucket=bucket, public=s3_public)
+
+                media_root = getattr(settings, "MEDIA_ROOT", None)
+                if target_path and media_root:
+                    try:
+                        relpath = Path(target_path).relative_to(media_root)
+                        # Use admin-facing download view
+                        from django.urls import reverse
+
+                        report_file_url = reverse("proje:report_download", args=[str(relpath)])
+                    except Exception:  # pylint: disable=broad-except
+                        report_file_url = None
 
             self.message_user(
                 request,
