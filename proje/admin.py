@@ -20,12 +20,7 @@ from proje.models import Agreement, Document, Owner, Ownership, Project, Unit
 
 from .admin_helpers import (
     AdminBootstrapMixin,
-    build_owner_assign_report,
-    prepare_owner_report,
-    parse_owner_assign_post,
-    build_owner_assign_context,
-)
-from .admin_helpers import (
+    perform_owner_assignment,
     create_documents_from_files,
     build_document_return_url,
 )
