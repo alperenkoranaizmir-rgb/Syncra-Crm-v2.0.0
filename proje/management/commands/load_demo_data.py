@@ -67,7 +67,7 @@ class Command(BaseCommand):
         )
         p1.staff.add(bob)
 
-        p2, _ = Project.objects.get_or_create(
+        Project.objects.get_or_create(
             code="DEMO002",
             defaults={
                 "name": "Demo Proje 2",

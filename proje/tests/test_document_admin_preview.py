@@ -18,7 +18,7 @@ class DocumentAdminPreviewTests(TestCase):
                 "tester", email="t@test.local", password="pw"
             )
 
-            admin_instance = admin.site._registry.get(Document)
+            admin_instance = admin.site._registry.get(Document)  # pylint: disable=protected-access
             self.assertIsNotNone(
                 admin_instance, "Document admin must be registered for the test"
             )

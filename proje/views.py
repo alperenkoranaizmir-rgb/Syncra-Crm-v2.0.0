@@ -123,7 +123,7 @@ def document_upload(request, project_pk=None, unit_pk=None):
     if unit_pk:
         try:
             unit = Unit.objects.get(pk=unit_pk)
-        except Exception:
+        except (Unit.DoesNotExist, ValueError, TypeError):
             unit = None
         if unit and not user_is_project_member(request.user, unit.project.pk):
             from django.http import HttpResponseForbidden
@@ -164,13 +164,13 @@ def report_download(request, filename):
     target = base / filename
     try:
         target_resolved = target.resolve()
-    except Exception:
-        raise Http404("Invalid file")
+    except (OSError, RuntimeError) as exc:
+        raise Http404("Invalid file") from exc
 
     try:
         base_resolved = base.resolve()
-    except Exception:
-        raise Http404("Invalid media root")
+    except (OSError, RuntimeError) as exc:
+        raise Http404("Invalid media root") from exc
 
     if (
         base_resolved not in target_resolved.parents

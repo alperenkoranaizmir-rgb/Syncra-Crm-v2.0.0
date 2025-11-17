@@ -22,8 +22,8 @@ class AdminBootstrapMixin:
                 else:
                     css = widget.attrs.get("class", "")
                     widget.attrs["class"] = (css + " form-control").strip()
-            except Exception:
-                # best-effort, don't fail admin
+            except (AttributeError, TypeError):
+                # best-effort: if widget lacks attrs or is unexpected, don't break admin
                 pass
 
     def get_form(self, request, obj=None, **kwargs):
@@ -31,6 +31,7 @@ class AdminBootstrapMixin:
         # apply classes to form fields
         try:
             self._add_bootstrap(form)
-        except Exception:
+        except (AttributeError, TypeError):
+            # best-effort application of classes; don't fail admin rendering
             pass
         return form

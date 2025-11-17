@@ -43,11 +43,23 @@ def create_groups(apps, schema_editor):
 def reverse_create_groups(apps, schema_editor):
     Group = apps.get_model("auth", "Group")
     try:
-        Group.objects.filter(
-            name__in=["Proje Yöneticisi", "Kentsel Dönüşüm Uzmanı"]
-        ).delete()
-    except Exception:
-        pass
+        from django.db import DatabaseError
+
+        try:
+            Group.objects.filter(
+                name__in=["Proje Yöneticisi", "Kentsel Dönüşüm Uzmanı"]
+            ).delete()
+        except DatabaseError:
+            # If DB is not available or in an unexpected state, ignore for reverse
+            pass
+    except Exception:  # pylint: disable=broad-except
+        # If we cannot import DatabaseError for some reason, silently ignore
+        try:
+            Group.objects.filter(
+                name__in=["Proje Yöneticisi", "Kentsel Dönüşüm Uzmanı"]
+            ).delete()
+        except Exception:  # pylint: disable=broad-except
+            pass
 
 
 class Migration(migrations.Migration):

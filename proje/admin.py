@@ -5,6 +5,7 @@ from pathlib import Path
 from django import forms
 from django.conf import settings
 from django.contrib import admin
+from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.shortcuts import render
@@ -41,7 +42,7 @@ class OwnerAdmin(AdminBootstrapMixin, admin.ModelAdmin):
         def __init__(self, *args, **kwargs):
             super().__init__(*args, **kwargs)
             # add consistent classes to widgets
-            for name, field in self.fields.items():
+            for _, field in self.fields.items():
                 widget = field.widget
                 css = widget.attrs.get("class", "")
                 widget.attrs["class"] = (css + " form-control").strip()
@@ -67,7 +68,7 @@ class OwnerAdmin(AdminBootstrapMixin, admin.ModelAdmin):
             group = Group.objects.filter(pk=group_pk).first()
             if not group:
                 self.message_user(
-                    request, "No group selected", level=admin.messages.ERROR
+                    request, "No group selected", level=messages.ERROR
                 )
                 return None
 
@@ -152,7 +153,7 @@ class OwnerAdmin(AdminBootstrapMixin, admin.ModelAdmin):
                         target_path, bucket=bucket, public=s3_public
                     )
                     report_s3_url = res.get("url")
-                except Exception:
+                except Exception:  # pylint: disable=broad-except
                     report_s3_url = None
 
             # prepare download URL if file is under MEDIA_ROOT
@@ -167,7 +168,7 @@ class OwnerAdmin(AdminBootstrapMixin, admin.ModelAdmin):
                     report_file_url = reverse(
                         "proje:report_download", args=[str(relpath)]
                     )
-                except Exception:
+                except Exception:  # pylint: disable=broad-except
                     report_file_url = None
 
             self.message_user(
@@ -178,7 +179,7 @@ class OwnerAdmin(AdminBootstrapMixin, admin.ModelAdmin):
             # Render a result page with report rows and optional download link
             media_url = getattr(settings, "MEDIA_URL", "")
             context = {
-                "opts": self.model._meta,
+                "opts": self.model._meta,  # pylint: disable=protected-access
                 "report_rows": report_rows,
                 "report_file": report_file,
                 "report_file_url": report_file_url,
@@ -194,7 +195,7 @@ class OwnerAdmin(AdminBootstrapMixin, admin.ModelAdmin):
         context = {
             "owners": queryset,
             "group_form": self.GroupAssignActionForm(),
-            "opts": self.model._meta,
+            "opts": self.model._meta,  # pylint: disable=protected-access
             "action": "assign_group_to_owner_users",
         }
         return render(request, "admin/proje/owner_assign_confirm.html", context)
@@ -225,14 +226,14 @@ class DocumentInline(AdminBootstrapMixin, admin.TabularInline):
         uploader = None
         try:
             size = obj.file.size
-        except Exception:
+        except (AttributeError, OSError):
             size = None
         try:
             if getattr(obj.uploaded_by, "get_full_name", None):
                 uploader = obj.uploaded_by.get_full_name()
             else:
                 uploader = getattr(obj.uploaded_by, "username", None)
-        except Exception:
+        except AttributeError:
             uploader = None
         # Render a clickable thumbnail link when possible, including metadata attrs
         if url:
@@ -300,14 +301,14 @@ class DocumentAdmin(AdminBootstrapMixin, admin.ModelAdmin):
         uploader = None
         try:
             size = obj.file.size
-        except Exception:
+        except (AttributeError, OSError):
             size = None
         try:
             if getattr(obj.uploaded_by, "get_full_name", None):
                 uploader = obj.uploaded_by.get_full_name()
             else:
                 uploader = getattr(obj.uploaded_by, "username", None)
-        except Exception:
+        except AttributeError:
             uploader = None
         if url:
             tpl = (
@@ -333,14 +334,14 @@ class DocumentAdmin(AdminBootstrapMixin, admin.ModelAdmin):
                 uploader = None
                 try:
                     size = obj.file.size
-                except Exception:
+                except (AttributeError, OSError):
                     size = None
                 try:
                     if getattr(obj.uploaded_by, "get_full_name", None):
                         uploader = obj.uploaded_by.get_full_name()
                     else:
                         uploader = getattr(obj.uploaded_by, "username", None)
-                except Exception:
+                except AttributeError:
                     uploader = None
                 tpl = (
                     '<a href="{}" class="doc-thumb-link" data-full="{}" '
@@ -384,7 +385,7 @@ class DocumentAdmin(AdminBootstrapMixin, admin.ModelAdmin):
         def __init__(self, *args, **kwargs):
             super().__init__(*args, **kwargs)
             # Add Bootstrap / AdminLTE classes to widgets for consistent styling
-            for name, field in self.fields.items():
+            for _, field in self.fields.items():
                 widget = field.widget
                 css = widget.attrs.get("class", "")
                 classes = (css + " form-control").strip()
@@ -435,7 +436,7 @@ class DocumentAdmin(AdminBootstrapMixin, admin.ModelAdmin):
             self.admin_site.each_context(request),
             title="Proje Dosyası Ekle (Çoklu)",
             form=form,
-            opts=self.model._meta,
+            opts=self.model._meta,  # pylint: disable=protected-access
         )
         from django.template.response import TemplateResponse
 
