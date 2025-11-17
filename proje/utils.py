@@ -1,3 +1,8 @@
+"""Utility helpers for `proje` app.
+
+Small helpers for generating report paths and uploading files to S3.
+"""
+
 import re
 from datetime import datetime
 from typing import Optional
@@ -56,7 +61,9 @@ def _sanitize_label(label: str) -> str:
 
 
 def generate_report_path(
-    prefix: str = "reports/proje_assign", ext: str = "csv", label: str | None = None
+    prefix: str = "reports/proje_assign",
+    ext: str = "csv",
+    label: str | None = None,
 ) -> str:
     """Return a timestamped report path string under `prefix` with extension `ext`.
 

@@ -15,6 +15,12 @@ class AdminBootstrapMixin:
     """
 
     def _add_bootstrap(self, form):
+        """Apply Bootstrap/AdminLTE classes to form widgets in `form`.
+
+        This is a best-effort helper that modifies `widget.attrs['class']`
+        to include framework-specific classes and silently ignores widgets
+        that do not support attrs.
+        """
         for field in getattr(form, "base_fields", {}).values():
             widget = field.widget
             try:
