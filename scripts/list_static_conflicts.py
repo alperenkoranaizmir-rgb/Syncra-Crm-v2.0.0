@@ -21,6 +21,7 @@ from django.contrib.staticfiles import finders
 
 
 def storage_repr(storage):
+    """Return a short string representation for a staticfiles storage instance."""
     # Try to display useful info about the storage/source
     cls = storage.__class__.__module__ + "." + storage.__class__.__name__
     loc = getattr(storage, "location", None) or getattr(storage, "prefix", None)
@@ -33,13 +34,15 @@ def main():
         try:
             for path, storage in finder.list([]):
                 mapping[path].append(storage_repr(storage))
-        except Exception as e:  # noqa: E722 - external finders may raise various errors
-            # some finders may not support list without globs depending on Django version
+        except Exception as e:  # pylint: disable=broad-except
+            # External finders may raise a variety of errors depending on Django
+            # version or storage backends. Log and attempt a fallback listing with
+            # a glob; intentionally broad here to be resilient across environments.
             logging.warning("finder.list([]) failed: %s", e)
             try:
                 for path, storage in finder.list(["*"]):
                     mapping[path].append(storage_repr(storage))
-            except Exception as e2:  # noqa: E722
+            except Exception as e2:  # pylint: disable=broad-except
                 logging.warning("finder.list([*]) also failed: %s", e2)
 
     conflicts = {p: s for p, s in mapping.items() if len({*s}) > 1}

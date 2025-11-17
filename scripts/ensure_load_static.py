@@ -13,6 +13,7 @@ TEMPLATES_DIR = ROOT / "templates"
 
 
 def process_file(p: Path):
+    """Read file `p` and insert `{% load static %}` if template uses static but doesn't load it."""
     text = p.read_text(encoding="utf-8")
     if "{% static" not in text:
         return False
@@ -32,12 +33,14 @@ def process_file(p: Path):
 
 
 def main():
+    """Walk template directory and ensure `{% load static %}` is present where needed."""
     changed = []
     for p in TEMPLATES_DIR.rglob("*.html"):
         try:
             if process_file(p):
                 changed.append(str(p.relative_to(ROOT)))
-        except Exception as e:  # noqa: E722
+        except (OSError, UnicodeDecodeError) as e:
+            # I/O or decoding issue while reading/writing templates; report and continue
             print("ERROR", p, e)
     print("Updated", len(changed), "templates")
     for c in changed[:200]:

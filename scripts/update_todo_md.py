@@ -20,16 +20,19 @@ TODO_MD = ROOT / "TODO.md"
 
 
 def load_state():
+    """Load JSON state from `scripts/todo_state.json` and return as dict."""
     with STATE_FILE.open("r", encoding="utf-8") as f:
         return json.load(f)
 
 
 def save_state(state):
+    """Persist the given `state` dict back to `scripts/todo_state.json`."""
     with STATE_FILE.open("w", encoding="utf-8") as f:
         json.dump(state, f, ensure_ascii=False, indent=2)
 
 
 def render_md(state):
+    """Render the TODO markdown text from the in-memory `state` dict."""
     lines = [
         "# TODO (Canlı Liste)",
         "",
@@ -72,6 +75,7 @@ def render_md(state):
 
 
 def cmd_set(state, tid, newstatus):
+    """Set the status for task id `tid` to `newstatus` and write outputs."""
     found = False
     for t in state["todos"]:
         if int(t["id"]) == int(tid):
@@ -88,6 +92,7 @@ def cmd_set(state, tid, newstatus):
 
 
 def main(argv):
+    """CLI entrypoint. Without args regenerates TODO.md, with `set` updates a task."""
     if len(argv) < 2:
         state = load_state()
         md = render_md(state)

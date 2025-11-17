@@ -24,6 +24,7 @@ def needs_load(text: str) -> bool:
 
 
 def process_file(path: Path) -> bool:
+    """Return True if `path` was updated to include `{% load static %}`."""
     text = path.read_text(encoding="utf-8")
     if needs_load(text):
         # Insert after possible template encoding comment or right at top
@@ -40,12 +41,14 @@ def process_file(path: Path) -> bool:
 
 
 def main():
+    """Walk templates and add `{% load static %}` where necessary."""
     changed = []
     for p in TEMPLATES_DIR.rglob("*.html"):
         try:
             if process_file(p):
                 changed.append(p.relative_to(ROOT))
-        except Exception as e:
+        except (OSError, UnicodeDecodeError) as e:
+            # File I/O or decoding error — report and continue processing other templates
             print(f"Failed {p}: {e}")
     if changed:
         print("Updated templates:")
