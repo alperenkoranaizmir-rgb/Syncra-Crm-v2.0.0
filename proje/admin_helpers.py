@@ -15,12 +15,13 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.urls import reverse
+from django.utils.html import format_html
+
+from botocore.exceptions import BotoCoreError, ClientError
 
 from proje.models import Document
 
 from .utils import upload_file_to_s3, generate_report_path
-
-from botocore.exceptions import BotoCoreError, ClientError
 
 
 class AdminBootstrapMixin:
@@ -234,6 +235,72 @@ def create_documents_from_files(files, labels, project, unit, uploaded_by):
         )
         created.append(doc)
     return created
+
+
+def format_file_link_html(obj):
+    """Return HTML link or plain name for a `Document`-like object.
+
+    This small helper centralizes file-link rendering used by both inlines
+    and list displays in the admin. It intentionally tolerates missing
+    attributes and returns a safe HTML string via `format_html` when a
+    URL is available.
+    """
+    if not obj or not getattr(obj, "file", None):
+        return "-"
+    url = getattr(obj.file, "url", None)
+    name = getattr(obj, "label", None) or str(getattr(obj.file, "name", "")).rsplit("/", 1)[-1]
+    size = None
+    uploader = None
+    try:
+        size = obj.file.size
+    except (AttributeError, OSError):
+        size = None
+    try:
+        if getattr(getattr(obj, "uploaded_by", None), "get_full_name", None):
+            uploader = obj.uploaded_by.get_full_name()
+        else:
+            uploader = getattr(obj.uploaded_by, "username", None)
+    except AttributeError:
+        uploader = None
+    if url:
+        tpl = (
+            '<a href="{}" class="doc-thumb-link" data-full="{}" '
+            'data-size="{}" data-uploader="{}" target="_blank">{}</a>'
+        )
+        return format_html(tpl, url, url, size or "", uploader or "", name)
+    return name
+
+
+def format_preview_html(obj):
+    """Return HTML for preview (image thumbnail or link) for a Document-like obj."""
+    if not obj or not getattr(obj, "file", None):
+        return "-"
+    url = getattr(obj.file, "url", None)
+    if url:
+        fname = str(getattr(obj.file, "name", "")).lower()
+        if fname.endswith((".png", ".jpg", ".jpeg", ".gif", ".webp")):
+            size = None
+            uploader = None
+            try:
+                size = obj.file.size
+            except (AttributeError, OSError):
+                size = None
+            try:
+                if getattr(getattr(obj, "uploaded_by", None), "get_full_name", None):
+                    uploader = obj.uploaded_by.get_full_name()
+                else:
+                    uploader = getattr(obj.uploaded_by, "username", None)
+            except AttributeError:
+                uploader = None
+            tpl = (
+                '<a href="{}" class="doc-thumb-link" data-full="{}" '
+                'data-size="{}" data-uploader="{}"><img src="{}" class="doc-thumb"/></a>'
+            )
+            return format_html(tpl, url, url, size or "", uploader or "", url)
+    name = getattr(obj, "label", None) or str(getattr(obj.file, "name", "")).rsplit("/", 1)[-1]
+    if getattr(getattr(obj, "file", None), "url", None):
+        return format_html('<a href="{}" target="_blank">{}</a>', getattr(obj.file, "url"), name)
+    return name
 
 
 def build_document_return_url(unit):

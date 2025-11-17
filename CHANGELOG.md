@@ -60,3 +60,27 @@ Bu dosya proje içi önemli değişiklikleri kronolojik olarak kaydeder. `script
 
 ## 2025-11-17 05:44:47 UTC — chore(migrations): docstrings and safer reverse delete handling for groups migration
 
+
+## 2025-11-17 07:16:57 UTC — chore(admin): extract owner-assignment helper, move imports to module level, reduce lint warnings
+
+
+## 2025-11-17 07:17:39 UTC — refactor(admin): import perform_owner_assignment, remove unused helper imports
+
+
+## 2025-11-17 07:19:43 UTC — refactor(admin): extract process_bulk_document_upload helper and use in DocumentAdmin.add_view; reorder imports
+
+
+## 2025-11-17 07:30:59 UTC — chore(admin): narrow broad-except for S3/upload errors; chore(migrations): add short module docstrings
+
+
+## 2025-11-17 07:31:53 UTC — chore(lint): reorder imports and add migration class docstrings
+
+
+## 2025-11-17 07:42:20 UTC — chore(admin): add admin UI snapshot
+
+
+## 2025-11-17 07:50:35 UTC — refactor(admin): extract admin forms to proje.admin_forms
+
+
+## 2025-11-17 07:51:27 UTC — style(admin): move admin forms to module and remove unused imports
+

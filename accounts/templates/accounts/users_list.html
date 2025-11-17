@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Kullanıcılar</h1>
+<table class="table table-striped">
+  <thead><tr><th>Kullanıcı</th><th>E-Posta</th><th>Departman</th><th>Ünvan</th><th>Durum</th><th></th></tr></thead>
+  <tbody>
+  {% for u in users %}
+    <tr>
+      <td>{{ u.get_full_name|default:u.username }}</td>
+      <td>{{ u.email }}</td>
+      <td>{{ u.profile.department.name if u.profile.department }}</td>
+      <td>{{ u.profile.title.name if u.profile.title }}</td>
+      <td>{{ u.profile.is_active_employee }}</td>
+      <td><a class="btn btn-sm btn-primary" href="{% url 'accounts:user_edit' u.pk %}">Düzenle</a></td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

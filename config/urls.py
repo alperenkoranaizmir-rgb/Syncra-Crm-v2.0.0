@@ -25,6 +25,7 @@ urlpatterns = [
     path("", include("core.urls", namespace="core")),
     path("proje/", include("proje.urls", namespace="proje")),
     path("accounts/", include("django.contrib.auth.urls")),
+    path("accounts/manage/", include(("accounts.urls", "accounts"), namespace="accounts")),
 ]
 
 # Serve static in development

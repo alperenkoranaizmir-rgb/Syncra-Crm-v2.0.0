@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Kullanıcı düzenle - {{ user_obj.get_full_name|default:user_obj.username }}</h1>
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  <div class="row">
+    <div class="col-md-6">{{ uform.as_p }}</div>
+    <div class="col-md-6">{{ pform.as_p }}</div>
+  </div>
+  <button class="btn btn-success" type="submit">Kaydet</button>
+</form>
+{% endblock %}

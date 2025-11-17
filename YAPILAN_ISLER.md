@@ -60,3 +60,27 @@ Detaylı yapılan değişiklikler commit geçmişinde bulunmaktadır; hızlı ö
 
 ### Son Değişiklikler (2025-11-17):
 - chore(migrations): docstrings and safer reverse delete handling for groups migration
+
+### Son Değişiklikler (2025-11-17):
+- chore(admin): extract owner-assignment helper, move imports to module level, reduce lint warnings
+
+### Son Değişiklikler (2025-11-17):
+- refactor(admin): import perform_owner_assignment, remove unused helper imports
+
+### Son Değişiklikler (2025-11-17):
+- refactor(admin): extract process_bulk_document_upload helper and use in DocumentAdmin.add_view; reorder imports
+
+### Son Değişiklikler (2025-11-17):
+- chore(admin): narrow broad-except for S3/upload errors; chore(migrations): add short module docstrings
+
+### Son Değişiklikler (2025-11-17):
+- chore(lint): reorder imports and add migration class docstrings
+
+### Son Değişiklikler (2025-11-17):
+- chore(admin): add admin UI snapshot
+
+### Son Değişiklikler (2025-11-17):
+- refactor(admin): extract admin forms to proje.admin_forms
+
+### Son Değişiklikler (2025-11-17):
+- style(admin): move admin forms to module and remove unused imports
