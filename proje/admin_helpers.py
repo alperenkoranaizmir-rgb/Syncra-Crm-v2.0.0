@@ -19,6 +19,7 @@ from django.urls import reverse
 from proje.models import Document
 
 from .utils import upload_file_to_s3, generate_report_path
+from botocore.exceptions import BotoCoreError, ClientError
 
 
 class AdminBootstrapMixin:
@@ -106,9 +107,8 @@ def upload_report_to_s3(target_path, bucket=None, public=False):
     try:
         res = upload_file_to_s3(target_path, bucket=bucket, public=public)
         return res.get("url")
-    except Exception:  # pragma: no cover - best-effort
-        # Best-effort upload; do not propagate exceptions to admin UI
-        # pylint: disable=broad-except
+    except (FileNotFoundError, ValueError, OSError, BotoCoreError, ClientError):
+        # Best-effort upload; do not propagate expected S3/upload errors to admin UI
         return None
 
 
@@ -209,7 +209,8 @@ def prepare_owner_report(
             try:
                 relpath = Path(target_path).relative_to(media_root)
                 report_file_url = reverse("proje:report_download", args=[str(relpath)])
-            except Exception:  # pylint: disable=broad-except
+            except (ValueError, OSError):
+                # relative_to may raise ValueError if paths are unrelated
                 report_file_url = None
 
     return target_path, report_file, report_file_url, report_s3_url
