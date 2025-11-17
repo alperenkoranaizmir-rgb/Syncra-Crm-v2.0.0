@@ -36,7 +36,7 @@ except (
     print("Django not available or failed to setup:", exc, file=sys.stderr)
     sys.exit(2)
 
-from django.contrib.auth import get_user_model  # pylint: disable=wrong-import-position,invalid-name
+from django.contrib.auth import get_user_model  # pylint: disable=wrong-import-position
 from django.test.client import Client  # pylint: disable=wrong-import-position
 
 OUT_FILE = os.path.join(os.path.dirname(__file__), "admin_add_snapshot.html")
@@ -47,8 +47,8 @@ def ensure_superuser(username="admin", email="admin@example.com", password="admi
 
     Returns the (username, password) tuple used to login.
     """
-    User = get_user_model()
-    user, created = User.objects.get_or_create(
+    user_model = get_user_model()
+    user, created = user_model.objects.get_or_create(
         username=username,
         defaults={"email": email, "is_superuser": True, "is_staff": True},
     )
