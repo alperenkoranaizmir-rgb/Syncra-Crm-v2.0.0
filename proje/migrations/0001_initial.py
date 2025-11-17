@@ -14,6 +14,8 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
+    """Initial migration for `proje` models."""
+
     initial = True
 
     dependencies = [

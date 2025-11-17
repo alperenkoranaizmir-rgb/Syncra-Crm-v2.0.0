@@ -12,6 +12,8 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
+    """Migration that adds `label` field to `Document` model."""
+
     dependencies = [
         ("proje", "0002_create_groups"),
     ]
