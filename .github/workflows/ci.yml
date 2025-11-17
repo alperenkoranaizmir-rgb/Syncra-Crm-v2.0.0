@@ -96,3 +96,8 @@ jobs:
           DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/test_db
           REDIS_URL: redis://127.0.0.1:6379/0
         run: python manage.py test --verbosity=2
+
+      - name: Update changelogs (CI)
+        if: always()
+        run: |
+          python3 scripts/update_changelogs.py "CI: automatic changelog update"

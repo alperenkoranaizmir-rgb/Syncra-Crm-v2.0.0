@@ -10,7 +10,7 @@ If no message is provided, the script will use the last git commit message (if a
 """
 import subprocess  # nosec B404 - calling git is a controlled local operation
 import sys
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -38,12 +38,12 @@ def get_message():
             .strip()
         )
         return out or "(no commit message)"
-    except Exception:
+    except (subprocess.CalledProcessError, OSError):
         return "(manual update)"
 
 
 def append_changelog(msg: str):
-    ts = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC")
+    ts = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
     entry = f"## {ts} — {msg}\n\n"
     # Prepend to CHANGELOG (keep existing content)
     if not CHANGELOG.exists():
@@ -55,7 +55,7 @@ def append_changelog(msg: str):
 
 
 def update_md_files(msg: str):
-    note = f"\n### Son Değişiklikler ({datetime.utcnow().date()}):\n- {msg}\n"
+    note = f"\n### Son Değişiklikler ({datetime.now(timezone.utc).date()}):\n- {msg}\n"
     for f in FILES_TO_UPDATE:
         if not f.exists():
             f.write_text(f"# {f.name}\n\n{note}\n", encoding="utf-8")
