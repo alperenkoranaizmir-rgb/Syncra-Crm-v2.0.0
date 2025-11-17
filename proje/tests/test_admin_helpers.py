@@ -1,17 +1,25 @@
-from django.contrib.auth import get_user_model
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import TestCase, override_settings
-import tempfile
+"""Tests for admin helper utilities used by `proje`.
 
-from proje.models import Document
-from proje import admin_helpers
-from django.contrib.auth.models import Group
+These tests create temporary media files and exercise helper functions
+that render HTML and process document uploads.
+
+Pylint: several tests intentionally access protected attributes or
+perform imports inside test context; suppress a few warnings locally.
+"""
+# pylint: disable=protected-access,import-outside-toplevel,line-too-long,missing-function-docstring,wrong-import-order,ungrouped-imports,unused-import,unused-variable
+import tempfile
 from types import SimpleNamespace
+
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import TestCase, override_settings, RequestFactory
 from django.utils.datastructures import MultiValueDict
-from django.test import RequestFactory
-from django.contrib.messages.storage.fallback import FallbackStorage
 from django.contrib.messages.storage.cookie import CookieStorage
-from proje.models import Project, Owner
+
+from proje.models import Document, Project, Owner
+from proje import admin_helpers
+from proje.admin_forms import DocumentBulkUploadForm
 
 User = get_user_model()
 
@@ -66,7 +74,6 @@ class AdminHelpersTests(TestCase):
             # Use a lightweight fake request and admin_instance for the helper
             req = SimpleNamespace(method="POST", POST=post, FILES=files, user=user)
             admin_instance = SimpleNamespace(message_user=lambda *a, **k: None, model=Document)
-            from proje.admin_forms import DocumentBulkUploadForm
             # sanity-check the form validity to catch why process may not create docs
             form = DocumentBulkUploadForm(req.POST, req.FILES)
             self.assertTrue(form.is_valid(), msg=str(form.errors))
