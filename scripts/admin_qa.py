@@ -20,6 +20,11 @@ import os
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 
 try:
+    # Ensure project root is on sys.path so `config` package can be imported
+    ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    if ROOT not in sys.path:
+        sys.path.insert(0, ROOT)
+
     import django
     django.setup()
 except Exception as exc:  # pragma: no cover - environment dependent
@@ -58,7 +63,8 @@ def fetch_admin_add_snapshot(url_path="/admin/proje/document/add/"):
     if not logged_in:
         print("Failed to login as superuser; check credentials or DB.")
         return False
-    response = client.get(url_path)
+    # Use a permissive host header to avoid DisallowedHost during test client requests
+    response = client.get(url_path, HTTP_HOST="localhost")
     if response.status_code != 200:
         print(f"Admin page returned status {response.status_code}")
         return False
