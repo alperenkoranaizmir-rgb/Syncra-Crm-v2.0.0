@@ -1,10 +1,26 @@
+"""Create initial permission groups used by the `proje` app.
+
+This migration creates two groups (`Proje Yöneticisi`,
+`Kentsel Dönüşüm Uzmanı`) and assigns appropriate permissions for the
+`proje` app models. The code is intentionally defensive: if ContentType
+or Permission records are missing the migration will continue without
+raising so migrations can run in partial environments.
+"""
+
 from django.db import migrations
 
 
 def create_groups(apps, schema_editor):
+    """Create the named groups and assign permissions for `proje` models.
+
+    This function is defensive: missing content types or permissions are
+    skipped so the migration does not fail when run in partial setups.
+    """
     Group = apps.get_model("auth", "Group")
     Permission = apps.get_model("auth", "Permission")
     ContentType = apps.get_model("contenttypes", "ContentType")
+    # `schema_editor` is provided by Django but not used here
+    del schema_editor
 
     # Models to assign permissions for
     model_names = ["owner", "unit", "agreement", "document"]
@@ -41,28 +57,35 @@ def create_groups(apps, schema_editor):
 
 
 def reverse_create_groups(apps, schema_editor):
-    Group = apps.get_model("auth", "Group")
-    try:
-        from django.db import DatabaseError
+    """Reverse operation: delete the created groups when rolling back.
 
-        try:
-            Group.objects.filter(
-                name__in=["Proje Yöneticisi", "Kentsel Dönüşüm Uzmanı"]
-            ).delete()
-        except DatabaseError:
-            # If DB is not available or in an unexpected state, ignore for reverse
-            pass
-    except Exception:  # pylint: disable=broad-except
-        # If we cannot import DatabaseError for some reason, silently ignore
-        try:
-            Group.objects.filter(
-                name__in=["Proje Yöneticisi", "Kentsel Dönüşüm Uzmanı"]
-            ).delete()
-        except Exception:  # pylint: disable=broad-except
-            pass
+    The function prefers to catch `DatabaseError` when deleting but will
+    fall back silently if the exception class cannot be imported in the
+    running environment.
+    """
+    Group = apps.get_model("auth", "Group")
+    # `schema_editor` parameter is not used by this reverse function
+    del schema_editor
+
+    try:
+        from django.db import DatabaseError  # type: ignore
+    except ImportError:  # pragma: no cover - environment dependent
+        # If DatabaseError cannot be imported, fall back to Exception so the
+        # deletion attempt still runs but we do not fail the reversal due to
+        # import issues in unusual environments.
+        DatabaseError = Exception  # type: ignore
+
+    try:
+        Group.objects.filter(
+            name__in=["Proje Yöneticisi", "Kentsel Dönüşüm Uzmanı"]
+        ).delete()
+    except DatabaseError:  # pylint: disable=broad-except
+        # If DB is not available or in an unexpected state, ignore for reverse
+        pass
 
 
 class Migration(migrations.Migration):
+    """Migration that creates initial groups and permissions for `proje`."""
 
     dependencies = [
         ("proje", "0001_initial"),
