@@ -1,3 +1,9 @@
+"""Data models for the `proje` app.
+
+Defines Project, Unit, Owner, Document and related models used across the
+application. Model field definitions and choice lists live here.
+"""
+
 from django.conf import settings
 from django.db import models
 

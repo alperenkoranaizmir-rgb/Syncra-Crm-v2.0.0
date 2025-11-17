@@ -30,3 +30,28 @@ Genel Kullanım Notları
 - Her child template `base.html`'i genişletir ve gerekirse `{% load static %}` eklemelidir.
 - Stil düzeltmeleri `static/css/` altındaki özel dosyalarda toplanmıştır; bu dosyalar `extra_css` içinde include edilir.
 - Plugin JS dosyaları `base.html` içinde veya ilgili şablonun `extra_js` bloğunda yüklenecek; mümkün olduğunda global inclusion `base.html`'de yapıldı.
+
+
+### Son Değişiklikler (2025-11-17):
+- Seed changelog: pixel-perfect & admin updates
+
+### Son Değişiklikler (2025-11-17):
+- Hooks enabled: automatic changelog updates
+
+### Son Değişiklikler (2025-11-17):
+- Make script timezone-aware
+
+### Son Değişiklikler (2025-11-17):
+- ci: run changelog updater in CI; make script timezone-aware
+
+### Son Değişiklikler (2025-11-17):
+- chore: run changelog updater only on success; add onboarding script to enable hooks
+
+### Son Değişiklikler (2025-11-17):
+- chore(scripts): add docstrings to update_changelogs functions
+
+### Son Değişiklikler (2025-11-17):
+- chore(lint): narrow broad except clauses and add targeted pylint disables
+
+### Son Değişiklikler (2025-11-17):
+- chore(lint): narrow script excepts, add docstrings for scripts, add pylint to CI

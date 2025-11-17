@@ -109,6 +109,9 @@ jobs:
 
       - name: Run Pylint (Django-aware)
         if: ${{ success() }}
+        env:
+          DJANGO_SETTINGS_MODULE: config.settings
         run: |
           # Run pylint against the proje app and scripts; do not fail the job on lint errors
+          # `DJANGO_SETTINGS_MODULE` ensures pylint-django can resolve ORM members
           pylint --rcfile=.pylintrc proje scripts || true

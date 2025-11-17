@@ -238,6 +238,19 @@ Yaptığım eklemelerle `proje` adlı yeni bir Django uygulaması eklendi. Bu mo
    - `/proje/` — Proje listesi
    - `/proje/add/` — Yeni proje ekle
    - `/proje/<pk>/` — Proje detay
+
+Developer setup (linters)
+-------------------------
+
+To run Pylint with Django support locally, install the development requirements and use the repo `.pylintrc`:
+
+```bash
+python3 -m pip install -r requirements-dev.txt
+pylint path/to/your/module.py
+```
+
+The `.pylintrc` in the repository enables the `pylint_django` plugin so Pylint will better understand Django model attributes (for example, `.objects`).
+
    - `/proje/<pk>/unit/add/` — Projeye bağımsız bölüm ekle
    - `/proje/<pk>/owner/add/` — Projeye malik ekle
    - `/proje/documents/` — Sistemdeki proje dosyaları
@@ -366,3 +379,15 @@ server {
 
 ### Son Değişiklikler (2025-11-17):
 - ci: run changelog updater in CI; make script timezone-aware
+
+### Son Değişiklikler (2025-11-17):
+- chore: run changelog updater only on success; add onboarding script to enable hooks
+
+### Son Değişiklikler (2025-11-17):
+- chore(scripts): add docstrings to update_changelogs functions
+
+### Son Değişiklikler (2025-11-17):
+- chore(lint): narrow broad except clauses and add targeted pylint disables
+
+### Son Değişiklikler (2025-11-17):
+- chore(lint): narrow script excepts, add docstrings for scripts, add pylint to CI

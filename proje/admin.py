@@ -1,3 +1,10 @@
+"""Django admin customizations for the `proje` app.
+
+Provides ModelAdmin classes and helper add views used in the admin site.
+This module centralizes admin UI tweaks (inlines, bulk upload, custom actions)
+and includes styling hooks for AdminLTE/Bootstrap integration.
+"""
+
 import csv
 import json
 from pathlib import Path

@@ -1,0 +1,11 @@
+[MASTER]
+# Enable Django-aware checks
+load-plugins=pylint_django
+
+[FORMAT]
+# Keep line length consistent with project lint expectations
+max-line-length=100
+
+[TYPECHECK]
+# Help with dynamic Django attributes like model managers
+generated-members=objects

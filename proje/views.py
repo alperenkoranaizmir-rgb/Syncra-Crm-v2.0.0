@@ -1,3 +1,10 @@
+"""Views for the `proje` application.
+
+Contains class-based and function-based views used by the `proje` app,
+including project CRUD, owner/unit/agreement creation and helper utilities
+like report file downloads.
+"""
+
 from pathlib import Path
 
 from django.conf import settings
